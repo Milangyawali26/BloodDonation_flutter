@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
     ),
     routes: {
       '/': (context) => const Splash(),
-      '/wrapper.dart':(context)=>  const Wrapper(),
+      '/wrapper':(context)=>  const Wrapper(),
       '/btm_nav_bar':(context)=> const BtmNavigationBar(),
       '/login': (context) => const Login(),
       '/signup': (context) => const SignUp(),

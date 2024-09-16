@@ -1,8 +1,9 @@
 import 'package:blood_app/firebase_authService.dart/firebase_dataBase_services.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:blood_app/model/user_model.dart';
+
+import '../firebase_authService.dart/firebase_auth_service.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -40,6 +41,42 @@ class _ProfileState extends State<Profile> {
         backgroundColor: Colors.red,
         title: const Text('Profile'),
         centerTitle: true,
+         actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () async {
+                await showDialog(
+                    context: context,
+                    builder: (BuildContext dialogContext) {
+                      return AlertDialog(
+                        icon: const Icon(Icons.warning),
+                        title: const Text('Signout User'),
+                        content: const Text('Are you sure you want to Signout?'),
+                        actions: [
+                          InkWell(
+                            child: const Text('Ok'),
+                            onTap: () async {
+                              final firebaseAuthService = FirebaseAuthService();
+                              firebaseAuthService.signOutUser();
+                            
+
+                              Navigator.of(dialogContext).pop();
+                              Navigator.of(context)
+                                  .pushReplacementNamed('/login');
+                            },
+                          ),
+                          InkWell(
+                            child: const Text('Cancel'),
+                            onTap: () {
+                              Navigator.of(dialogContext).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    });
+              },
+            ),
+          ],
       ),
       body: SingleChildScrollView(
         child: userModel == null

@@ -42,13 +42,13 @@ class _DonorProfileState extends State<DonorProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.red,
         title: const Text('Donor Profile'),
+        backgroundColor: Colors.red,
         centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: donorModel == null
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(child:(Text(" you are have not registered yourself as donor yet. ")))
             : Column(
                 children: [
                   Container(

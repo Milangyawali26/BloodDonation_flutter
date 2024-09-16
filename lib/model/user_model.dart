@@ -64,7 +64,7 @@ class DonorModel {
       "date of birth": dateOfBirth,
       'province': province,
       "district": district,
-      "local Government": district,
+      "local Government": localGovernment,
       'gender': gender,
       "Blood Group": bloodGroup,
     };

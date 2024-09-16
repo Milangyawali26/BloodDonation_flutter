@@ -44,7 +44,6 @@ class _DonorRegisterState extends State<DonorRegister> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -234,11 +233,10 @@ class _DonorRegisterState extends State<DonorRegister> {
                 validator: (value) =>
                     value == null ? 'Please select your date of birth' : null,
               ),
-
-              // Submit Button
-              const SizedBox(
+  const SizedBox(
                 height: 40,
               ),
+              // Submit Button
               SizedBox(
                 height: 40,
                 width: MediaQuery.of(context).size.width * 0.7,

@@ -1,3 +1,4 @@
+import 'package:blood_app/screens/all_donors.dart';
 import 'package:blood_app/screens/homepage.dart';
 import 'package:blood_app/screens/profile.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class _BtmNavigationBarState extends State<BtmNavigationBar> {
 
   final List<Widget> _pages=[
    HomePage(),
-   HomePage(),
+   AllDonorsScreen(),
    HomePage(),
    Profile(),
 
@@ -44,7 +45,7 @@ class _BtmNavigationBarState extends State<BtmNavigationBar> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.home), label: 'home'),
+              icon: Icon(Icons.person_search_outlined), label: 'all donors'),
           
           BottomNavigationBarItem(
               icon: Icon(Icons.home), label: 'home'),

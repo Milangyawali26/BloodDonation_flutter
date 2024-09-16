@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:blood_app/model/user_model.dart';
 
 class FirebaseDatabaseServices {
+  final donorList=[];
   final _firestoreDb = FirebaseFirestore.instance;
 
   /// Create a user in Cloud Firestore
@@ -119,4 +120,42 @@ class FirebaseDatabaseServices {
       return null;
     }
   }
+
+  Future getUsersInACollection() async {
+    try {
+      final CollectionReference _usersCollectionReference =
+          await _firestoreDb.collection('users');
+      await _usersCollectionReference.get().then((querySnapShot) {
+        for (var doc in querySnapShot.docs) {
+          donorList.add(doc.data());
+        }
+      });
+      return donorList;
+    } catch (e) {
+      print('Something Went Wrong $e');
+    }
+  }
+
+
+  //get donors from database
+ Future<List<DonorModel>> getDonorsFromDatabase() async {
+  List<DonorModel> donorList = [];
+  try {
+    final CollectionReference donorsCollectionReference = _firestoreDb.collection('donors');
+    final QuerySnapshot<Object?> snapShot = await donorsCollectionReference.get();
+
+    if (snapShot.docs.isNotEmpty) {
+      donorList = snapShot.docs
+          .map((doc) => DonorModel.fromJson(doc as DocumentSnapshot<Map<String, dynamic>>))
+          .toList();
+    } else {
+      throw Exception('No donors found');
+    }
+  } catch (e) {
+    print('Something went wrong $e');
+  }
+  return donorList;
+}
+
+
 }

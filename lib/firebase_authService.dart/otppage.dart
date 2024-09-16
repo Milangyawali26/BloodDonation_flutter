@@ -73,7 +73,7 @@ class _OtpPageState extends State<OtpPage> {
         child: Column(
           children: [
             Image.asset(
-              "otpImage.png",
+              "assets/otpImage.png",
               height: 300,
               width: 300,
             ),

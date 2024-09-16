@@ -30,174 +30,176 @@ class _LoginState extends State<Login> {
         backgroundColor: const Color.fromARGB(255, 158, 155, 148),
         title: const Text("Login"),
       ),
-      body: Form
-      (
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: Column(
-            children: [
-              TextFormField(
-                  controller: _emailAddressController,
-                  maxLength: 30,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Email address',
-                    prefixIcon: Icon(Icons.email),
+      body: SingleChildScrollView(
+        child: Form
+        (
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              children: [
+                TextFormField(
+                    controller: _emailAddressController,
+                    maxLength: 30,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Email address',
+                      prefixIcon: Icon(Icons.email),
+                    ),
+                    validator: (emailValue) {
+                      if (emailValue == null || emailValue.trim().isEmpty) {
+                        return 'Please enter your email address';
+                      }
+                      final regex = RegExp(_emailRegexPattern);
+                      if (!regex.hasMatch(emailValue)) {
+                        return 'Please enter a valid email';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (emailValue) {
-                    if (emailValue == null || emailValue.trim().isEmpty) {
-                      return 'Please enter your email address';
-                    }
-                    final regex = RegExp(_emailRegexPattern);
-                    if (!regex.hasMatch(emailValue)) {
-                      return 'Please enter a valid email';
+                const SizedBox(
+                  height: 10,
+                ),
+                TextFormField(
+                  controller: _passwordController,
+                  keyboardType: TextInputType.visiblePassword,
+                  maxLength: 20,
+                  obscureText: passwordVisible, // Variable name corrected
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.lock),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        passwordVisible ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          passwordVisible = !passwordVisible; // Update the state
+                        });
+                      },
+                    ),
+                    hintText: 'Password',
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                  ),
+                  validator: (passwordValue) {
+                    if (passwordValue == null || passwordValue.trim().isEmpty) {
+                      return 'Please Enter password';
                     }
                     return null;
                   },
                 ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextFormField(
-                controller: _passwordController,
-                keyboardType: TextInputType.visiblePassword,
-                maxLength: 20,
-                obscureText: passwordVisible, // Variable name corrected
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      passwordVisible ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        passwordVisible = !passwordVisible; // Update the state
-                      });
-                    },
-                  ),
-                  hintText: 'Password',
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  alignment: Alignment.topLeft,
+                  child: const Text(
+                    "Forget Password ?",
+                    style: TextStyle(
+                        color: const Color.fromARGB(255, 184, 59, 206),
+                        fontStyle: FontStyle.italic),
                   ),
                 ),
-                validator: (passwordValue) {
-                  if (passwordValue == null || passwordValue.trim().isEmpty) {
-                    return 'Please Enter password';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Container(
-                alignment: Alignment.topLeft,
-                child: const Text(
-                  "Forget Password ?",
-                  style: TextStyle(
-                      color: const Color.fromARGB(255, 184, 59, 206),
-                      fontStyle: FontStyle.italic),
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const Text(
+                        "Don't have Account?",
+                        style: TextStyle(
+                            color: const Color.fromARGB(255, 184, 59, 206),
+                            fontStyle: FontStyle.italic),
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/signup');
+                          },
+                          child: const Text(
+                            "SignUp",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ))
+                    ],
+                  ),
                 ),
-              ),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    const Text(
-                      "Don't have Account?",
-                      style: TextStyle(
-                          color: const Color.fromARGB(255, 184, 59, 206),
-                          fontStyle: FontStyle.italic),
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('/signup');
-                        },
-                        child: const Text(
-                          "SignUp",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ))
-                  ],
-                ),
-              ),
-
-              // login button
-              SizedBox(
-                height: 50,
-                width: 300,
-                child: ElevatedButton(
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                    onPressed: () async {
-
-                        if(_formKey.currentState!=null){
-                          if(_formKey.currentState!.validate()){
-
-                              final firebaseAuthService= FirebaseAuthService();
-                              final email=_emailAddressController.text;
-                              final password=_passwordController.text;
-                              final User? user = await firebaseAuthService.loginInWithEmailAndPassword(email, password);
-                              if (user != null) {
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('id', user.uid);
-        print('Login Success');
-        Navigator.of(context).pushReplacementNamed('/homepage');
-      } else {
-        print('Login Failed');
-      }
-
-
-                              
+        
+                // login button
+                SizedBox(
+                  height: 50,
+                  width: 300,
+                  child: ElevatedButton(
+                      style:
+                          ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                      onPressed: () async {
+                       print("login btn clicked");
+                          if(_formKey.currentState!=null){
+                            if(_formKey.currentState!.validate()){
+        
+                                final firebaseAuthService= FirebaseAuthService();
+                                final email=_emailAddressController.text;
+                                final password=_passwordController.text;
+                                final User? user = await firebaseAuthService.loginInWithEmailAndPassword(email, password);
+                                if (user != null) {
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('id', user.uid);
+          print('Login Success');
+          Navigator.of(context).pushReplacementNamed('/wrapper');
+        } else {
+          print('Login Failed');
+        }
+        
+        
+                                
+                            }
                           }
-                        }
-                      },
-                    child: const Text(
-                      "login",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    )),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 50),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                          color: Colors.black,
-                          height: 5,
-                          indent: 16,
-                          thickness: 2,
-                          endIndent: 16),
-                    ),
-                    Text("Or"),
-                    Expanded(
-                      child: Divider(
-                          color: Colors.black,
-                          height: 5,
-                          indent: 16,
-                          thickness: 2,
-                          endIndent: 16),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 50,
-                width: 300,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 178, 213, 231)),
-                  onPressed: () {},
-                  child: Text("Sign in with Google",
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
+                        },
+                      child: const Text(
+                        "login",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.white),
                       )),
                 ),
-              ),
-            ],
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 50),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                            color: Colors.black,
+                            height: 5,
+                            indent: 16,
+                            thickness: 2,
+                            endIndent: 16),
+                      ),
+                      Text("Or"),
+                      Expanded(
+                        child: Divider(
+                            color: Colors.black,
+                            height: 5,
+                            indent: 16,
+                            thickness: 2,
+                            endIndent: 16),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 50,
+                  width: 300,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 178, 213, 231)),
+                    onPressed: () {},
+                    child: Text("Sign in with Google",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        )),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
