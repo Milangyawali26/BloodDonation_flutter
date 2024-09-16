@@ -1,54 +1,107 @@
-import 'package:flutter/foundation.dart';
+import 'package:blood_app/firebase_authService.dart/firebase_dataBase_services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-
-import '../controller/imageController.dart';
+import 'package:blood_app/model/user_model.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
 
   @override
-  State<Profile> createState() => _homepageState();
+  State<Profile> createState() => _ProfileState();
 }
 
-class _homepageState extends State<Profile> {
-  final ImageController imageController = Get.put(ImageController());
+class _ProfileState extends State<Profile> {
+  final FirebaseDatabaseServices _databaseServices = FirebaseDatabaseServices();
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  UserModel? userModel;
+  
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserDetails();
+  }
+
+  Future<void> _fetchUserDetails() async {
+    if (currentUser != null) {
+      final userDetails = await _databaseServices.getUserDetailsFromUid(uid: currentUser!.uid);
+      setState(() {
+        userModel = userDetails;
+      });
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.red,
-          title: Text('Profile'),
-          centerTitle: true,
-        ),
-        body: Obx(
-           () {
-            return Column(
-              children: [
-                kIsWeb
-                    ? Image.memory(imageController.memoryImage.value,height: 50,width:50)
-                    : Image.file(imageController.image.value),
-                SizedBox(
-                  height: 10,
+      appBar: AppBar(
+        backgroundColor: Colors.red,
+        title: const Text('Profile'),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        child: userModel == null
+            ? const Center(child: CircularProgressIndicator())
+            : Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    
+                    ListTile(
+                      title: const Text('Full Name'),
+                      subtitle: Text(userModel!.fullName ?? 'N/A'),
+                    ),
+                    ListTile(
+                      title: const Text('Phone Number'),
+                      subtitle: Text(userModel!.signUpPhoneNumber ?? 'N/A'),
+                    ),
+                    Container(
+                      alignment: Alignment.topLeft,
+                      padding: const EdgeInsets.only(top: 20),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        child: const Text(
+                          "Become a Donor",
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pushNamed('/donorRegister');
+                        },
+                      ),
+                    ),
+                     Container(
+                      alignment: Alignment.topLeft,
+                      padding: const EdgeInsets.only(top: 20),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        child: const Text(
+                          "donor profile",
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pushNamed('/donorProfile');
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:[ ElevatedButton(
-                      child: Text('pick image'),
-                      onPressed: () => imageController.pickImage(
-                          isFromGallary: true, context: context)),
-
-                          SizedBox(width: 20,),
-
-                          ElevatedButton( child: Text('update image'),onPressed:()=>{  },)
-
-                  ]
-                        
-                ),
-                
-              ],
-            );
-          }
-        ));
+              ),
+      ),
+    );
   }
 }

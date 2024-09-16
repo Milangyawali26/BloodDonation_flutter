@@ -2,9 +2,11 @@
 import 'package:blood_app/firebase_authService.dart/Wrapper.dart';
 import 'package:blood_app/firebase_options.dart';
 import 'package:blood_app/screens/become_donor.dart';
+import 'package:blood_app/screens/donor_profile.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'screens/btn_nav_bar.dart';
 import 'screens/homepage.dart';
 import 'screens/login.dart';
 import 'screens/profile.dart';
@@ -36,11 +38,13 @@ class MyApp extends StatelessWidget {
     routes: {
       '/': (context) => const Splash(),
       '/wrapper.dart':(context)=>  const Wrapper(),
+      '/btm_nav_bar':(context)=> const BtmNavigationBar(),
       '/login': (context) => const Login(),
       '/signup': (context) => const SignUp(),
       '/homepage':(context)=>const HomePage(),
       '/profile':(context)=>const Profile(),
       '/donorRegister':(context)=>const DonorRegister(),
+      '/donorProfile':(context)=>const DonorProfile(),
     },
     initialRoute: '/',
     debugShowCheckedModeBanner: false,

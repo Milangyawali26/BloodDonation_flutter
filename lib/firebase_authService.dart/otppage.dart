@@ -5,7 +5,7 @@ import 'package:blood_app/model/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl_phone_field/phone_number.dart';
+
 import 'package:pinput/pinput.dart';
 
 class OtpPage extends StatefulWidget {

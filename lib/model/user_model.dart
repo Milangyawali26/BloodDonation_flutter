@@ -4,7 +4,6 @@ class UserModel {
   String? id;
   String? fullName;
   String? signUpPhoneNumber;
-
   String? email;
 
   UserModel({
@@ -23,51 +22,67 @@ class UserModel {
     };
   }
 
-  factory UserModel.fromJson(
-      QueryDocumentSnapshot<Map<String, dynamic>> document) {
-    final userData = document.data();
-    return UserModel(
-      id: userData['id'],
-      fullName: userData['fullName'],
-      signUpPhoneNumber: userData['sign Up phoneNumber'],
-      email: userData['email'],
-    );
-  }
+factory UserModel.fromJson(DocumentSnapshot<Map<String, dynamic>> document) {
+  final userData = document.data()!;
+  return UserModel(
+    id: userData['id'],
+    fullName: userData['fullName'],
+    signUpPhoneNumber: userData['sign Up phoneNumber'],
+    email: userData['email'],
+  );
 }
 
+}
 
-// class DonorModel{
-//   String? fullName;
-//   String? phoneNumber;
-//   String? dateOFBirth;
-//   String? province;
-//   String? district;
-//   String? localGovernment;
-//   String? gender;
-//   String? bloodgroup;
+class DonorModel {
+  String? id;
+  String? fullName;
+  String? phoneNumber;
+  String? dateOfBirth;
+  String? province;
+  String? district;
+  String? localGovernment;
+  String? gender;
+  String? bloodGroup;
 
-//   DonorModel({
-//     required this.fullName,
-//     required this.phoneNumber,
-//     required this.dateOFBirth,
-//     required this.province,
-//     required this.district,
-//     required this.localGovernment,
-//     required this.gender,
-//     required this.bloodgroup,
-//   });
-//   toJson(){
-//     return{
-//       'fullName':fullName,
-//       'phone Number':phoneNumber,
-//       "date of birth":dateOFBirth,
-//       'province':province,
-//       "district":district,
-//       "local Government":district,
-//       'gender':gender,
-//       "Blood Group":bloodgroup,
+  DonorModel(  {
+    required this.id,
+    required this.fullName,
+    required this.phoneNumber,
+    required this.dateOfBirth,
+    required this.province,
+    required this.district,
+    required this.localGovernment,
+    required this.gender,
+    required this.bloodGroup,
+  });
+  toJson() {
+    return {
+      'id':id,
+      'fullName': fullName,
+      'phone Number': phoneNumber,
+      "date of birth": dateOfBirth,
+      'province': province,
+      "district": district,
+      "local Government": district,
+      'gender': gender,
+      "Blood Group": bloodGroup,
+    };
+  }
 
-//     };
-//   }
+factory DonorModel.fromJson(DocumentSnapshot<Map<String, dynamic>> document) {
+  final donorData = document.data()!;
+  return DonorModel(
+    id: donorData['id'],
+    fullName: donorData['fullName'],
+    phoneNumber: donorData['phone Number'],
+    dateOfBirth: donorData['date of birth'],
+    province: donorData['province'],
+    district: donorData['district'],
+    localGovernment: donorData['local Government'],
+    gender: donorData['gender'],
+    bloodGroup: donorData['Blood Group'],
+  );
+}
 
-// }
+}

@@ -3,7 +3,7 @@
 import 'package:blood_app/constants/bloodgroups.dart';
 import 'package:blood_app/constants/districts.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -113,22 +113,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            Container(
-              alignment: Alignment.topLeft,
-              child: ElevatedButton(
-                 style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                child: Text("become a donor",style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),),
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/donorRegister');
-                },
-              ),
-            )
+           
           ],
         ),
       ),

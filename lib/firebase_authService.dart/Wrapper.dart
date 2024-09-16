@@ -1,4 +1,5 @@
 
+import 'package:blood_app/screens/btn_nav_bar.dart';
 import 'package:blood_app/screens/homepage.dart';
 import 'package:blood_app/screens/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,7 +19,7 @@ class _WrapperState extends State<Wrapper> {
       body: StreamBuilder(stream: FirebaseAuth.instance.authStateChanges(), builder: (context,snapshot){
         if(snapshot.hasData)
         {
-          return HomePage();
+          return BtmNavigationBar();
 
         }else{
           return Login();

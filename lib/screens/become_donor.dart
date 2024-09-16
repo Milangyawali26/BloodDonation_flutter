@@ -1,7 +1,12 @@
 import 'package:blood_app/constants/bloodgroups.dart';
+import 'package:blood_app/firebase_authService.dart/firebase_dataBase_services.dart';
+import 'package:blood_app/model/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../constants/location_data.dart'; 
+import 'package:get/get.dart';
+import '../constants/location_data.dart';
 
 class DonorRegister extends StatefulWidget {
   const DonorRegister({super.key});
@@ -26,21 +31,18 @@ class _DonorRegisterState extends State<DonorRegister> {
   List<String> _districts = [];
   List<String> _localGovernments = [];
 
-
 // function to select date of birth
-  Future<void> _selectBirthDate() async{
-      DateTime? _picked=  await showDatePicker(
-          context: context, 
-          initialDate: DateTime.now(),
-          firstDate: DateTime(1900), 
-          lastDate: DateTime(2100)
-        
-        );
-        if (_picked!=null){
-          setState((){
-            _dateOfBirthController.text = _picked.toString().split(" ")[0];
-          });
-        }
+  Future<void> _selectBirthDate() async {
+    DateTime? _picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(1900),
+        lastDate: DateTime(2100));
+    if (_picked != null) {
+      setState(() {
+        _dateOfBirthController.text = _picked.toString().split(" ")[0];
+      });
+    }
   }
 
   @override
@@ -176,8 +178,6 @@ class _DonorRegisterState extends State<DonorRegister> {
                 decoration: const InputDecoration(
                   labelText: 'Gender',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.transgender),
-                  
                 ),
                 value: _selectedGender,
                 items: ["Male", "Female", "Others"].map((String value) {
@@ -186,7 +186,7 @@ class _DonorRegisterState extends State<DonorRegister> {
                 }).toList(),
                 onChanged: (newValue) {
                   setState(() {
-                    _selectedLocalGovernment = newValue;
+                    _selectedGender = newValue;
                   });
                 },
                 validator: (value) =>
@@ -216,7 +216,9 @@ class _DonorRegisterState extends State<DonorRegister> {
                     value == null ? 'Please select a province' : null,
               ),
 
-                const SizedBox(height: 10,),
+              const SizedBox(
+                height: 10,
+              ),
               // birthdate
               TextFormField(
                 controller: _dateOfBirthController,
@@ -225,14 +227,13 @@ class _DonorRegisterState extends State<DonorRegister> {
                   labelText: 'Date of Birth',
                   prefixIcon: Icon(Icons.calendar_month),
                 ),
-                 readOnly: true,
-                 onTap: (){
+                readOnly: true,
+                onTap: () {
                   _selectBirthDate();
-                 },
-                  validator: (value) =>
+                },
+                validator: (value) =>
                     value == null ? 'Please select your date of birth' : null,
               ),
-
 
               // Submit Button
               const SizedBox(
@@ -245,12 +246,35 @@ class _DonorRegisterState extends State<DonorRegister> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                   ),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                     
+                  onPressed: () async {
+                    if (_formKey.currentState != null) {
+                      if (_formKey.currentState!.validate()) {
+                        try {
+                          User? currentUser = FirebaseAuth.instance.currentUser;
 
-                     // function to save data to data 
+                          if (currentUser != null) {
+                            final donorModel = DonorModel(
+                                id: currentUser.uid,
+                                fullName: _fullNameController.text,
+                                phoneNumber: _phoneNumberController.text,
+                                dateOfBirth: _dateOfBirthController.text,
+                                province: _selectedProvince,
+                                district: _selectedDistrict,
+                                localGovernment: _selectedLocalGovernment,
+                                gender: _selectedGender,
+                                bloodGroup: _selectedBloodGroup);
 
+                            FirebaseDatabaseServices()
+                                .createDonor(donorModel: donorModel,context: context);
+
+                          }
+                          
+                        } catch (e) {
+                          Get.snackbar('Error Occured', e.toString());
+                        }
+
+                        // function to save data to data
+                      }
                     }
                   },
                   child: const Text(
