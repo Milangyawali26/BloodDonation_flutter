@@ -1,7 +1,12 @@
 import 'package:blood_app/firebase_authService.dart/firebase_dataBase_services.dart';
+import 'package:blood_app/screens/update_donor_details.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:blood_app/model/user_model.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+
+import '../firebase_authService.dart/locationService.dart';
 
 class DonorProfile extends StatefulWidget {
   const DonorProfile({super.key});
@@ -11,6 +16,12 @@ class DonorProfile extends StatefulWidget {
 }
 
 class _DonorProfileState extends State<DonorProfile> {
+  String locationMessage = 'Current location of user';
+  late String latitude;
+  late String longitude;
+  // Instance of LocationService
+  final LocationService _locationService = LocationService();
+
   final FirebaseDatabaseServices _databaseServices = FirebaseDatabaseServices();
   User? currentUser = FirebaseAuth.instance.currentUser;
   DonorModel? donorModel;
@@ -24,7 +35,8 @@ class _DonorProfileState extends State<DonorProfile> {
   void fetchDonorDetails() async {
     if (currentUser != null) {
       String uid = currentUser!.uid;
-      DonorModel? donor = await _databaseServices.getDonorDetailsFromId(uid: uid);
+      DonorModel? donor =
+          await _databaseServices.getDonorDetailsFromId(uid: uid);
       setState(() {
         donorModel = donor;
       });
@@ -48,12 +60,77 @@ class _DonorProfileState extends State<DonorProfile> {
       ),
       body: SingleChildScrollView(
         child: donorModel == null
-            ? const Center(child:(Text(" you are have not registered yourself as donor yet. ")))
+            ? const Center(
+                child: (Text(
+                    " you are have not registered yourself as donor yet. ")))
             : Column(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(10.0),
-                    child: BasicDetails(donorModel: donorModel),
+                  Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10.0),
+                        child: BasicDetails(donorModel: donorModel),
+                      ),
+                      Positioned(
+                        top: 30.0,
+                        right: 30.0,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => UpdateDonorDetails()),
+                            );
+                          },
+                          child: Text("Update"),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    height: 60,
+                    width: 200,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        try {
+                          Position position =
+                              await _locationService.getCurrentLocation();
+                          latitude = '${position.latitude}';
+                          longitude = '${position.longitude}';
+
+                          if (currentUser != null) {
+                            String uid = currentUser!.uid;
+
+                            //update donor's latitude in firebase
+                            donorModel!.latitude = position.latitude;
+                            donorModel!.longitude = position.longitude;
+
+                            await _databaseServices.updateDonorsUsingId(
+                              context: context,
+                                uid: uid, donorModel: donorModel!);
+
+                            Get.snackbar(
+                                'your current location updated successfully. ',
+                                toString());
+
+                            print("Location updated successfully");
+                          }
+
+                          setState(() {
+                            locationMessage =
+                                'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
+                          });
+                        } catch (e) {
+                          setState(() {
+                            locationMessage = 'Error: $e';
+                          });
+                        }
+                      },
+                      child: const Text('Click to get your current location'),
+                    ),
                   ),
                 ],
               ),

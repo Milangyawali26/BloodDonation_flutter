@@ -1,21 +1,20 @@
 import 'package:blood_app/constants/bloodgroups.dart';
 import 'package:blood_app/firebase_authService.dart/firebase_dataBase_services.dart';
 import 'package:blood_app/model/user_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../constants/location_data.dart';
 
-class DonorRegister extends StatefulWidget {
-  const DonorRegister({super.key});
+class UpdateDonorDetails extends StatefulWidget {
+  const UpdateDonorDetails({super.key});
 
   @override
-  State<DonorRegister> createState() => _DonorRegisterState();
+  State<UpdateDonorDetails> createState() => _UpdateDonorDetailsState();
 }
 
-class _DonorRegisterState extends State<DonorRegister> {
+class _UpdateDonorDetailsState extends State<UpdateDonorDetails> {
   final _formKey = GlobalKey<FormState>();
   final _fullNameController = TextEditingController();
   final _phoneNumberController = TextEditingController();
@@ -48,7 +47,7 @@ class _DonorRegisterState extends State<DonorRegister> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Become a Donor"),
+        title: const Text("update a Donor profile"),
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
@@ -250,24 +249,22 @@ class _DonorRegisterState extends State<DonorRegister> {
                       if (_formKey.currentState!.validate()) {
                         try {
                           User? currentUser = FirebaseAuth.instance.currentUser;
+                          String uid=currentUser!.uid;
+                          final donorModel = DonorModel(
+                              id: currentUser.uid,
+                              fullName: _fullNameController.text,
+                              phoneNumber: _phoneNumberController.text,
+                              dateOfBirth: _dateOfBirthController.text,
+                              province: _selectedProvince,
+                              district: _selectedDistrict,
+                              localGovernment: _selectedLocalGovernment,
+                              gender: _selectedGender,
+                              bloodGroup: _selectedBloodGroup);
 
-                          if (currentUser != null) {
-                            final donorModel = DonorModel(
-                                id: currentUser.uid,
-                                fullName: _fullNameController.text,
-                                phoneNumber: _phoneNumberController.text,
-                                dateOfBirth: _dateOfBirthController.text,
-                                province: _selectedProvince,
-                                district: _selectedDistrict,
-                                localGovernment: _selectedLocalGovernment,
-                                gender: _selectedGender,
-                                bloodGroup: _selectedBloodGroup);
+                          FirebaseDatabaseServices()
+                              .updateDonorsUsingId(context:context,uid:uid,donorModel:  donorModel,);
 
-                            FirebaseDatabaseServices()
-                                .createDonor(donorModel: donorModel,context: context);
-
-                          }
-                          
+                                                  
                         } catch (e) {
                           Get.snackbar('Error Occured', e.toString());
                         }
@@ -277,7 +274,7 @@ class _DonorRegisterState extends State<DonorRegister> {
                     }
                   },
                   child: const Text(
-                    'Submit',
+                    'Update and Save',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

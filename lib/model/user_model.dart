@@ -1,3 +1,5 @@
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserModel {
@@ -43,18 +45,27 @@ class DonorModel {
   String? district;
   String? localGovernment;
   String? gender;
+  
   String? bloodGroup;
+  
+  double?  latitude;
+  double? longitude;
+
 
   DonorModel(  {
-    required this.id,
-    required this.fullName,
-    required this.phoneNumber,
-    required this.dateOfBirth,
-    required this.province,
-    required this.district,
-    required this.localGovernment,
-    required this.gender,
-    required this.bloodGroup,
+    this.id,
+    this.fullName,
+    this.phoneNumber,
+    this.dateOfBirth,
+    this.province,
+    this.district,
+    this.localGovernment,
+    this.gender,
+    this.bloodGroup,
+    this.latitude,
+    this.longitude,
+
+    
   });
   toJson() {
     return {
@@ -67,6 +78,9 @@ class DonorModel {
       "local Government": localGovernment,
       'gender': gender,
       "Blood Group": bloodGroup,
+      "latitude":latitude,
+      "longitude":longitude,
+
     };
   }
 
@@ -82,6 +96,8 @@ factory DonorModel.fromJson(DocumentSnapshot<Map<String, dynamic>> document) {
     localGovernment: donorData['local Government'],
     gender: donorData['gender'],
     bloodGroup: donorData['Blood Group'],
+    latitude: donorData['latitude'],
+    longitude: donorData['longitude'],
   );
 }
 

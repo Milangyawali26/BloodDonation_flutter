@@ -1,6 +1,6 @@
+import 'package:blood_app/screens/donor_profile.dart';
 import 'package:blood_app/screens/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:blood_app/model/user_model.dart';
 
@@ -136,7 +136,6 @@ class FirebaseDatabaseServices {
     }
   }
 
-
   //get donors from database
  Future<List<DonorModel>> getDonorsFromDatabase() async {
   List<DonorModel> donorList = [];
@@ -156,6 +155,55 @@ class FirebaseDatabaseServices {
   }
   return donorList;
 }
+
+//update donors using uid
+  Future<DonorModel?>updateDonorsUsingId({required BuildContext context ,required String uid,required DonorModel donorModel}) async{
+    try{
+         final CollectionReference _usersCollectionReference =
+          await _firestoreDb.collection('donors');
+      final documentSnapshot =
+          await _usersCollectionReference.where('id', isEqualTo: uid).get();
+      if (documentSnapshot.docs.isNotEmpty) {
+        final documentId = documentSnapshot.docs.first.id;
+        await _usersCollectionReference
+            .doc(documentId)
+            .update(donorModel.toJson()).then((_){
+               showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text("Donor  updated "),
+            content: const Text(" Donor profile updated Successfully"),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => const DonorProfile()),
+                  );
+                },
+                child: Container(
+                  color: Colors.green,
+                  padding: const EdgeInsets.all(14),
+                  child: const Text("Okay"),
+                ),
+              ),
+            ],
+          ),
+          );
+              
+            });
+           
+      }
+       else {
+        print("donor not found here "); 
+        return null;
+      }
+    }
+
+    catch (e) {
+      print('Something went wrong $e');
+    }
+    return null;
+  }
 
 
 }
