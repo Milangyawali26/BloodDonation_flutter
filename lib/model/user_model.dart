@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
 class UserModel {
   String? id;
   String? fullName;
@@ -35,8 +36,8 @@ factory UserModel.fromJson(DocumentSnapshot<Map<String, dynamic>> document) {
 }
 
 }
-
 class DonorModel {
+  bool? isAvailable;
   String? id;
   String? fullName;
   String? phoneNumber;
@@ -45,14 +46,13 @@ class DonorModel {
   String? district;
   String? localGovernment;
   String? gender;
-  
   String? bloodGroup;
-  
-  double?  latitude;
+  double? latitude;
   double? longitude;
+  double? distance;
 
-
-  DonorModel(  {
+  DonorModel({
+    this.isAvailable,
     this.id,
     this.fullName,
     this.phoneNumber,
@@ -64,41 +64,127 @@ class DonorModel {
     this.bloodGroup,
     this.latitude,
     this.longitude,
+    this.distance,
 
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'isAvailable':isAvailable,
+      'id': id,
+      'fullName': fullName,
+      'phoneNumber': phoneNumber,  
+      'dateOfBirth': dateOfBirth,  
+      'province': province,
+      'district': district,
+      'localGovernment': localGovernment,  
+      'gender': gender,
+      'bloodGroup': bloodGroup,  
+      'latitude': latitude,
+      'longitude': longitude,
+      'distance':distance,
+    };
+  }
+
+  factory DonorModel.fromJson(DocumentSnapshot<Map<String, dynamic>> document) {
+    final donorData = document.data()!;
+    return DonorModel(
+      isAvailable: donorData['isAvailable'],
+      id: donorData['id'],
+      fullName: donorData['fullName'],
+      phoneNumber: donorData['phoneNumber'],  
+      dateOfBirth: donorData['dateOfBirth'],  
+      province: donorData['province'],
+      district: donorData['district'],
+      localGovernment: donorData['localGovernment'],  
+      gender: donorData['gender'],
+      bloodGroup: donorData['bloodGroup'],  
+      latitude: donorData['latitude'],
+      longitude: donorData['longitude'],
+
+      distance: donorData['distance'],
+    );
+  }
+}
+
+class RequestModel{
+
+  String? userId;
+  String? patientName;
+  String? gender;
+  String? contactPersonName;
+  String? phoneNumber;
+  String? hospitalName;
+  String? bloodGroup;
+  String? requiredPint;
+  String? caseDetail;
+  String? province;
+  String? district;
+  String? localGovernment;
+  String? requiredDate;
+  String? requiredTime;
+  String? requestId;
+
+  RequestModel({
+    this.userId,
+    this.patientName,
+    this.gender,
+    this.contactPersonName,
+    this.phoneNumber,
+    this.hospitalName,
+    this.bloodGroup,
+    this.caseDetail,
+    this.requiredDate,
+    this.requiredTime,
+    this.requiredPint,
+    this.province,
+    this.district,
+    this.localGovernment,
+    this.requestId,
     
   });
-  toJson() {
-    return {
-      'id':id,
-      'fullName': fullName,
-      'phone Number': phoneNumber,
-      "date of birth": dateOfBirth,
-      'province': province,
-      "district": district,
-      "local Government": localGovernment,
-      'gender': gender,
-      "Blood Group": bloodGroup,
-      "latitude":latitude,
-      "longitude":longitude,
+
+  Map<String,dynamic> toJson(){
+    return{
+      'userId':userId,
+      'requestId':requestId,
+      'patientName':patientName,
+      'gender':gender,
+      'contactPersonName':contactPersonName,
+      'phoneNumber':phoneNumber,
+      'hospitalName':hospitalName,
+      'bloodGroup':bloodGroup,
+      'caseDetail':caseDetail,
+      'requiredDate':requiredDate,
+      'requiredTime':requiredTime,
+      'requiredPint':requiredPint,
+       'province': province,
+      'district': district,
+      'localGovernment': localGovernment,  
 
     };
   }
 
-factory DonorModel.fromJson(DocumentSnapshot<Map<String, dynamic>> document) {
-  final donorData = document.data()!;
-  return DonorModel(
-    id: donorData['id'],
-    fullName: donorData['fullName'],
-    phoneNumber: donorData['phone Number'],
-    dateOfBirth: donorData['date of birth'],
-    province: donorData['province'],
-    district: donorData['district'],
-    localGovernment: donorData['local Government'],
-    gender: donorData['gender'],
-    bloodGroup: donorData['Blood Group'],
-    latitude: donorData['latitude'],
-    longitude: donorData['longitude'],
+factory RequestModel.fromJson(Map<String,dynamic> json){
+  final requestData=json;
+  return RequestModel(
+  
+    userId:requestData['userId'],
+    requestId: requestData['requestId'],
+    patientName: requestData['patientName'],
+    gender: requestData['gender'],
+    contactPersonName: requestData['contactPersonName'],
+    phoneNumber: requestData['phoneNumber'],
+    hospitalName: requestData['hospitalName'],
+    bloodGroup: requestData['bloodGroup'],
+    requiredDate: requestData['requiredDate'],
+    requiredTime: requestData['requiredTime'],
+    requiredPint: requestData['requiredPint'],
+    caseDetail: requestData['caseDetail'],
+      province: requestData['province'],
+      district: requestData['district'],
+      localGovernment: requestData['localGovernment'],  
+
   );
 }
-
 }

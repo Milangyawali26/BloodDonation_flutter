@@ -61,156 +61,158 @@ class _SignUpState extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 100,
-        backgroundColor: const Color.fromARGB(255, 158, 155, 148),
-        title: const Text("SignUp"),
-      ),
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              children: [
-          
-                TextFormField(
-                  controller: _fullNameController,
-                  keyboardType: TextInputType.name,
-                  maxLength: 30,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Enter full name',
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                  validator: (fullNameValue) {
-                    if (fullNameValue == null || fullNameValue.trim().isEmpty) {
-                      return 'Please Enter Full Name';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                
-                const SizedBox(width: 10),
-                   TextFormField(
-                    controller: _emailAddressController,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 100,
+          backgroundColor: Colors.red,
+          title: const Text("SignUp"),
+        ),
+        body: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                children: [
+            
+                  TextFormField(
+                    controller: _fullNameController,
+                    keyboardType: TextInputType.name,
                     maxLength: 30,
-                    keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'Email address',
-                      prefixIcon: Icon(Icons.email),
+                      labelText: 'Enter full name',
+                      prefixIcon: Icon(Icons.person),
                     ),
-                    validator: (emailValue) {
-                      if (emailValue == null || emailValue.trim().isEmpty) {
-                        return 'Please enter your email address';
-                      }
-                      final regex = RegExp(_emailRegexPattern);
-                      if (!regex.hasMatch(emailValue)) {
-                        return 'Please enter a valid email';
+                    validator: (fullNameValue) {
+                      if (fullNameValue == null || fullNameValue.trim().isEmpty) {
+                        return 'Please Enter Full Name';
                       }
                       return null;
                     },
                   ),
-                  SizedBox(height: 10,),
-                TextFormField(
-                  maxLength: 10,
-                  controller: _signupPhoneNumberController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Mobile Number for Signup',
-                    prefixIcon: Icon(Icons.phone_android),
+                  const SizedBox(
+                    height: 10,
                   ),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your phone number';
-                    } else if (value.length != 10) {
-                      return 'Mobile number must be 10 digits';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _passwordController,
-                  keyboardType: TextInputType.visiblePassword,
-                  maxLength: 20,
-                  obscureText: passwordVisible, // Variable name corrected
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        passwordVisible ? Icons.visibility : Icons.visibility_off,
+                  
+                  const SizedBox(width: 10),
+                     TextFormField(
+                      controller: _emailAddressController,
+                      maxLength: 30,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Email address',
+                        prefixIcon: Icon(Icons.email),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          passwordVisible = !passwordVisible; // Update the state
-                        });
+                      validator: (emailValue) {
+                        if (emailValue == null || emailValue.trim().isEmpty) {
+                          return 'Please enter your email address';
+                        }
+                        final regex = RegExp(_emailRegexPattern);
+                        if (!regex.hasMatch(emailValue)) {
+                          return 'Please enter a valid email';
+                        }
+                        return null;
                       },
                     ),
-                    hintText: 'Password',
-                    border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    SizedBox(height: 10,),
+                  TextFormField(
+                    maxLength: 10,
+                    controller: _signupPhoneNumberController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Mobile Number for Signup',
+                      prefixIcon: Icon(Icons.phone_android),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your phone number';
+                      } else if (value.length != 10) {
+                        return 'Mobile number must be 10 digits';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    controller: _passwordController,
+                    keyboardType: TextInputType.visiblePassword,
+                    maxLength: 20,
+                    obscureText: passwordVisible, // Variable name corrected
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.lock),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          passwordVisible ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            passwordVisible = !passwordVisible; // Update the state
+                          });
+                        },
+                      ),
+                      hintText: 'Password',
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                    ),
+                    validator: (passwordValue) {
+                      if (passwordValue == null || passwordValue.trim().isEmpty) {
+                        return 'Please Enter password';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const Text('already have an account'),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/login');
+                          },
+                          child: const Text(
+                            "Login",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ))
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30),
+                    child: SizedBox(
+                      height: 50,
+                      width: 300,
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange),
+                          onPressed: () async {
+                                      print('sign up button clicked');
+                            if(_formKey.currentState!=null){
+                              if(_formKey.currentState!.validate()){
+                            sendcode();
+                              }
+                            }
+                          },
+                          child: const Text(
+                            "Signup",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, color: Colors.white),
+                          )),
                     ),
                   ),
-                  validator: (passwordValue) {
-                    if (passwordValue == null || passwordValue.trim().isEmpty) {
-                      return 'Please Enter password';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    const Text('already have an account'),
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('/login');
-                        },
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ))
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 30),
-                  child: SizedBox(
-                    height: 50,
-                    width: 300,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange),
-                        onPressed: () async {
-                                    print('sign up button clicked');
-                          if(_formKey.currentState!=null){
-                            if(_formKey.currentState!.validate()){
-                          sendcode();
-                            }
-                          }
-                        },
-                        child: const Text(
-                          "Signup",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.white),
-                        )),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

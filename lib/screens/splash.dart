@@ -31,11 +31,13 @@ class _SplashState extends State<Splash> {
   
 
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body:Center(
-        child: CircularProgressIndicator(),
-      )
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body:Center(
+          child: CircularProgressIndicator(),
+        )
+      ),
     );
   }
 }

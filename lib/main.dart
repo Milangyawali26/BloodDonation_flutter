@@ -3,6 +3,8 @@ import 'package:blood_app/firebase_authService.dart/Wrapper.dart';
 import 'package:blood_app/firebase_options.dart';
 import 'package:blood_app/screens/become_donor.dart';
 import 'package:blood_app/screens/donor_profile.dart';
+import 'package:blood_app/screens/myBloodRequest.dart';
+import 'package:blood_app/screens/request_for_blood.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,6 +47,9 @@ class MyApp extends StatelessWidget {
       '/profile':(context)=>const Profile(),
       '/donorRegister':(context)=>const DonorRegister(),
       '/donorProfile':(context)=>const DonorProfile(),
+      '/myBloodRequest':(context)=>const MyBloodRequest(),
+      '/addRequest':(context)=>const RequestForBlood(),
+      
     },
     initialRoute: '/',
     debugShowCheckedModeBanner: false,
