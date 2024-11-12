@@ -181,9 +181,9 @@ factory RequestModel.fromJson(Map<String,dynamic> json){
     requiredTime: requestData['requiredTime'],
     requiredPint: requestData['requiredPint'],
     caseDetail: requestData['caseDetail'],
-      province: requestData['province'],
-      district: requestData['district'],
-      localGovernment: requestData['localGovernment'],  
+    province: requestData['province'],
+    district: requestData['district'],
+    localGovernment: requestData['localGovernment'],  
 
   );
 }

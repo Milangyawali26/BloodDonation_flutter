@@ -132,6 +132,7 @@ class FirebaseDatabaseServices {
     }
   }
 
+
 // this is unused function
   Future<List<Map<String, dynamic>>> getDonorsInACollection() async {
     List<Map<String, dynamic>> donorList = []; // Initialize donorList here
@@ -151,6 +152,7 @@ class FirebaseDatabaseServices {
       return []; // Return an empty list in case of an error
     }
   }
+
 
 // Function to calculate the Haversine distance between two points
   Future<double> calculateHaversineDistance(double donorLatitude,
@@ -174,11 +176,12 @@ class FirebaseDatabaseServices {
     return distance;
   }
 
+
+
 // Function to get donors from database and calculate distances
   Future<List<DonorModel>> getDonorsFromDatabase() async {
     List<DonorModel> donorList = [];
     Position userPosition;
-
     try {
       // Get user's current location
       userPosition = await LocationService().getCurrentLocation();
@@ -221,11 +224,11 @@ class FirebaseDatabaseServices {
     } catch (e) {
       print('Something went wrong: $e');
     }
-
     return donorList;
   }
-
 // Example of the LocationService class to get the user's current location
+
+
 
 //update donors using uid
   Future<DonorModel?> updateDonorsUsingId(
@@ -275,6 +278,7 @@ class FirebaseDatabaseServices {
     return null;
   }
 
+
 //update donors avalibilty usind uid 
   Future<void> updateDonorAvailability({required String uid, required bool isAvailable}) async {
     try {
@@ -285,6 +289,7 @@ class FirebaseDatabaseServices {
       print('Error updating availability: $e'); // Handle error appropriately
     }
   }
+
 
 // function  add Blood request in database
   void addRequest(
@@ -314,6 +319,7 @@ class FirebaseDatabaseServices {
               ],
             ));
   }
+
 
 // get bloodrequest form userid of current user
 Future<List<RequestModel>?> getBloodRequestFromId({
@@ -348,8 +354,8 @@ Future<List<RequestModel>> getAllBloodRequest() async {
   List<RequestModel> bloodRequestList = [];
 
   try {
-    final CollectionReference _bloodRequestsCollection = _firestoreDb.collection('bloodRequest');
-    final QuerySnapshot<Map<String, dynamic>> snapShot = await _bloodRequestsCollection.get() as QuerySnapshot<Map<String, dynamic>>; // Cast the result
+    final CollectionReference bloodRequestsCollection = _firestoreDb.collection('bloodRequest');
+    final QuerySnapshot<Map<String, dynamic>> snapShot = await bloodRequestsCollection.get() as QuerySnapshot<Map<String, dynamic>>; // Cast the result
     
     if (snapShot.docs.isNotEmpty) {
       bloodRequestList = snapShot.docs.map((doc) {
@@ -369,7 +375,6 @@ Future<List<RequestModel>> getAllBloodRequest() async {
 
 
 // update blood request by id  
-
 Future<RequestModel?>updateBloodRequestUsingId(
       {required BuildContext context,
       required String uid,
@@ -453,8 +458,8 @@ Future<RequestModel?>updateBloodRequestUsingId(
   }
 
 
-  // method to delete bloodrequest by id
-  Future<void> deleteBloodRequest(String requestId,String uid)async{
+  // method to delete bloodrequest by request id and uid
+  static Future<void> deleteBloodRequest(String requestId,String uid)async{
     try{
       //Refernces of firestore collection
       CollectionReference bloodRequest=FirebaseFirestore.instance.collection('bloodRequest');

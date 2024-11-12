@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 
 import '../firebase_authService.dart/locationService.dart';
 
+
 class DonorProfile extends StatefulWidget {
   const DonorProfile({super.key});
 
@@ -23,6 +24,7 @@ class _DonorProfileState extends State<DonorProfile> {
   final FirebaseDatabaseServices _databaseServices = FirebaseDatabaseServices();
   User? currentUser = FirebaseAuth.instance.currentUser;
   DonorModel? donorModel;
+  bool _isLoading = true; // Add loading state flag
 
   @override
   void initState() {
@@ -37,6 +39,7 @@ class _DonorProfileState extends State<DonorProfile> {
           await _databaseServices.getDonorDetailsFromId(uid: uid);
       setState(() {
         donorModel = donor;
+        _isLoading = false; // Set loading to false once data is fetched
       });
       if (donor != null) {
         print('Donor Found: ${donor.fullName}');
@@ -45,6 +48,9 @@ class _DonorProfileState extends State<DonorProfile> {
       }
     } else {
       print('No User ID found');
+      setState(() {
+        _isLoading = false; // Set loading to false if no user found
+      });
     }
   }
 
@@ -57,109 +63,136 @@ class _DonorProfileState extends State<DonorProfile> {
           backgroundColor: Colors.red,
           centerTitle: true,
         ),
-        body: SingleChildScrollView(
-          child: donorModel == null
-              ? const Center(
-                  child: Text("You have not registered yourself as a donor yet."))
-              : Column(
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10.0),
-                          child: BasicDetails(donorModel: donorModel),
+        body: _isLoading // Show loading indicator while loading data
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: donorModel == null
+                    ? Center(
+                        child: Column(
+                          children: [
+                            const Text("You have not registered yourself as a donor yet."),
+                            Container(
+                              alignment: Alignment.topLeft,
+                              padding: const EdgeInsets.only(top: 20),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Become a Donor',
+                                  style: TextStyle(
+                                      color: Colors.white, fontWeight: FontWeight.bold),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed('/donorRegister');
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                        Positioned(
-                          top: 30.0,
-                          right: 30.0,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => UpdateDonorDetails()),
-                              );
-                            },
-                            child: const Text("Update"),
+                      )
+                    : Column(
+                        children: [
+                          Stack(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10.0),
+                                child: BasicDetails(donorModel: donorModel),
+                              ),
+                              Positioned(
+                                top: 30.0,
+                                right: 30.0,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => UpdateDonorDetails()),
+                                    );
+                                  },
+                                  child: const Text("Update"),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-      
-                    // Availability Toggle
-                    SwitchListTile(
-                      title: const Text('Is Available?'),
-                      value: donorModel?.isAvailable ?? false, // Use null-aware operator
-                       activeColor: Colors.green,  // Color when switched on
-      inactiveThumbColor: Colors.red,
-                      onChanged: (value) async {
-                        if (donorModel != null) {
-                          setState(() {
-                            donorModel!.isAvailable = value; // Update the state
-                          });
-      
-                          // Update availability in Firestore
-                          await _databaseServices.updateDonorsUsingId(
-                            context: context,
-                            uid: currentUser!.uid,
-                            donorModel: donorModel!,
-                          );
-                        }
-                      },
-                    ),
-      
-                    const SizedBox(height: 20),
-      
-                    // Get current location of donor
-                    SizedBox(
-                      height: 60,
-                      width: 200,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          try {
-                            Position position =
-                                await _locationService.getCurrentLocation();
-                            latitude = '${position.latitude}';
-                            longitude = '${position.longitude}';
-      
-                            if (currentUser != null) {
-                              String uid = currentUser!.uid;
-      
-                              // Update donor's latitude in Firebase
-                              donorModel!.latitude = position.latitude;
-                              donorModel!.longitude = position.longitude;
-      
-                              await _databaseServices.updateDonorsUsingId(
-                                context: context,
-                                uid: uid,
-                                donorModel: donorModel!,
-                              );
-      
-                              Get.snackbar(
-                                'Success',
-                                'Your current location updated successfully.',
-                              );
-      
-                              print("Location updated successfully");
-                            }
-      
-                            setState(() {
-                              locationMessage =
-                                  'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
-                            });
-                          } catch (e) {
-                            setState(() {
-                              locationMessage = 'Error: $e';
-                            });
-                          }
-                        },
-                        child: const Text('Click to get your current location'),
+                          const SizedBox(height: 10),
+
+                          // Availability Toggle
+                          SwitchListTile(
+                            title: const Text('Is Available?'),
+                            value: donorModel?.isAvailable ?? false, // Use null-aware operator
+                            activeColor: Colors.green,  // Color when switched on
+                            inactiveThumbColor: Colors.red,
+                            onChanged: (value) async {
+                              if (donorModel != null) {
+                                setState(() {
+                                  donorModel!.isAvailable = value; // Update the state
+                                });
+
+                                // Update availability in Firestore
+                                await _databaseServices.updateDonorsUsingId(
+                                  context: context,
+                                  uid: currentUser!.uid,
+                                  donorModel: donorModel!,
+                                );
+                              }
+                            },
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Get current location of donor
+                          SizedBox(
+                            height: 60,
+                            width: 200,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                try {
+                                  Position position =
+                                      await _locationService.getCurrentLocation();
+                                  latitude = '${position.latitude}';
+                                  longitude = '${position.longitude}';
+
+                                  if (currentUser != null) {
+                                    String uid = currentUser!.uid;
+
+                                    // Update donor's latitude in Firebase
+                                    donorModel!.latitude = position.latitude;
+                                    donorModel!.longitude = position.longitude;
+
+                                    await _databaseServices.updateDonorsUsingId(
+                                      context: context,
+                                      uid: uid,
+                                      donorModel: donorModel!,
+                                    );
+
+                                    Get.snackbar(
+                                      'Success',
+                                      'Your current location updated successfully.',
+                                    );
+
+                                    print("Location updated successfully");
+                                  }
+
+                                  setState(() {
+                                    locationMessage =
+                                        'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
+                                  });
+                                } catch (e) {
+                                  setState(() {
+                                    locationMessage = 'Error: $e';
+                                  });
+                                }
+                              },
+                              child: const Text('Click to get your current location'),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-        ),
+              ),
       ),
     );
   }

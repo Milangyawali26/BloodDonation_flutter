@@ -18,6 +18,7 @@ class _SearchdonorsState extends State<Searchdonors> {
   List<String> _districts = [];
   List<String> _localGovernments = [];
   List<DonorModel> filteredDonors = [];
+ 
 
   final FirebaseDatabaseServices firebaseDatabaseServices =
       FirebaseDatabaseServices();
@@ -66,10 +67,9 @@ class _SearchdonorsState extends State<Searchdonors> {
         body: Column(
           children: [
             // select blood group, province, district, local government
-           Container(
+            Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               margin: const EdgeInsets.symmetric(horizontal: 20),
-              
               child: Column(
                 children: [
                   // Blood Group Dropdown
@@ -205,7 +205,8 @@ class _SearchdonorsState extends State<Searchdonors> {
                     return Center(child: Text("Error: ${snapshot.error}"));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Center(
-                        child: Text("No donors found. Please check back later."));
+                        child:
+                            Text("No donors found. Please check back later."));
                   } else if (filteredDonors.isEmpty) {
                     return const Center(
                         child: Text(
@@ -215,27 +216,41 @@ class _SearchdonorsState extends State<Searchdonors> {
                       itemCount: filteredDonors.length,
                       itemBuilder: (context, index) {
                         DonorModel donor = filteredDonors[index];
-      
+
                         return Container(
-                          margin:
-                              const EdgeInsets.only(left: 20, right: 20, top: 5),
+                          margin: const EdgeInsets.only(
+                              left: 20, right: 20, top: 5),
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.red),
                             borderRadius: BorderRadius.circular(16.0),
                             color: const Color.fromARGB(255, 240, 211, 209),
                           ),
                           child: ListTile(
-                            trailing: Text(
-                                "${donor.distance?.toStringAsFixed(2)} KM away"),
-                            contentPadding: const EdgeInsets.all(8),
                             title: Text(donor.fullName ?? "Unknown Donor",
-                                style:
-                                    const TextStyle(fontWeight: FontWeight.bold)),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
                             subtitle: Text(
-                              "${donor.bloodGroup ?? "N/A"} - ${donor.phoneNumber ?? "No phone"}",
+                              "${donor.bloodGroup ?? "N/A"}     ${donor.phoneNumber ?? "No phone"}",
                               style: const TextStyle(
                                   color: Color.fromARGB(255, 20, 20, 20)),
                             ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                    "${donor.distance?.toStringAsFixed(2)}+  KM away"),
+                                const SizedBox(width: 10),
+                                ElevatedButton(
+                                    onPressed: () {},
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 5),
+                                      textStyle: const TextStyle(fontSize: 12),
+                                    ),
+                                    child: const Text("notify")),
+                              ],
+                            ),
+                            contentPadding: const EdgeInsets.all(8),
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(

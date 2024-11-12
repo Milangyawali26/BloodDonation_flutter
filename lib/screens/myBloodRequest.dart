@@ -2,6 +2,7 @@ import 'package:blood_app/model/user_model.dart';
 import 'package:blood_app/screens/updateBloodRequest.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../firebase_authService.dart/firebase_dataBase_services.dart';
 
 class MyBloodRequest extends StatefulWidget {
@@ -12,12 +13,13 @@ class MyBloodRequest extends StatefulWidget {
 }
 
 class _MyBloodRequestState extends State<MyBloodRequest> {
-  final FirebaseDatabaseServices _firebaseDatabaseServices =
-      FirebaseDatabaseServices();
+  final FirebaseDatabaseServices _firebaseDatabaseServices = FirebaseDatabaseServices();
   User? currentUser = FirebaseAuth.instance.currentUser;
-  
   // Declare a list to hold the requests
   List<RequestModel> requests = [];
+  bool _isLoading = true;
+
+
 
   // Fetching blood requests
   Future<void> fetchRequestDetails() async {
@@ -29,6 +31,7 @@ class _MyBloodRequestState extends State<MyBloodRequest> {
       // Update state with fetched requests
       setState(() {
         requests = bloodRequest ?? [];
+        _isLoading=false;
       });
     }
   }
@@ -37,19 +40,6 @@ class _MyBloodRequestState extends State<MyBloodRequest> {
   void initState() {
     super.initState();
     fetchRequestDetails();
-  }
-
-  // Callback for deleting a request
-  void _deleteRequest(String requestId, int index) async {
-    if (currentUser != null) {
-      String uid = currentUser!.uid;
-      await _firebaseDatabaseServices.deleteBloodRequest(requestId, uid);
-
-      // Remove the deleted request from the list and refresh UI
-      setState(() {
-        requests.removeAt(index);
-      });
-    }
   }
 
   @override
@@ -61,14 +51,38 @@ class _MyBloodRequestState extends State<MyBloodRequest> {
           backgroundColor: Colors.red,
           centerTitle: true,
         ),
-        body: requests.isEmpty
-            ? const Center(child: Text('You have not made any blood requests.'))
+        body: _isLoading?const Center(child: CircularProgressIndicator(),): requests.isEmpty
+            ? Center(child: Column(
+              children: [
+                const Text('You have not made any blood requests.'),
+                   Container(
+                        alignment: Alignment.topLeft,
+                        padding: const EdgeInsets.only(top: 20),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                          ),
+                          child: const Text(
+                            'make a blood Request',
+                            style: TextStyle(
+                                color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/addRequest');
+                          },
+                        ),
+                      ),
+              ],
+            ))
             : ListView.builder(
                 itemCount: requests.length,
                 itemBuilder: (context, index) {
                   return BasicDetails(
                     requestModel: requests[index],
-                    onDelete: () => _deleteRequest(requests[index].requestId!, index), // Pass the onDelete callback
+                   
                   );
                 },
               ),
@@ -81,11 +95,11 @@ class BasicDetails extends StatelessWidget {
   const BasicDetails({
     super.key,
     required this.requestModel,
-    required this.onDelete, // Add the onDelete callback
+    
   });
 
   final RequestModel requestModel;
-  final VoidCallback onDelete; // Callback for deletion
+
 
   @override
   Widget build(BuildContext context) {
@@ -163,8 +177,28 @@ class BasicDetails extends StatelessWidget {
             top: 80.0,
             right: 30.0,
             child: ElevatedButton(
-              onPressed: onDelete, // Use the onDelete callback here
+           onPressed: () async {
+  String requestId = requestModel.requestId ?? '';
+  try {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      await FirebaseDatabaseServices.deleteBloodRequest(requestId, currentUser.uid);
+    }
+  } catch (e) {
+    Get.snackbar("Error occurred", e.toString());
+  }
+},
+
               child: const Text("Delete"),
+            ),
+          ),
+           Positioned(
+            top: 130,
+            right: 30.0,
+            child: ElevatedButton(
+              onPressed: (){
+              }, // Use the onDelete callback here
+              child: const Text("urgent "),
             ),
           ),
         ],

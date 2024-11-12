@@ -17,34 +17,32 @@ class _AllBloodRequestState extends State<AllBloodRequest>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final _formKey = GlobalKey<FormState>();
-
   String? _selectedProvince;
   String? _selectedDistrict;
   String? _selectedLocalGovernment;
   String? _selectedBloodGroup;
-
   List<String> _districts = [];
   List<String> _localGovernments = [];
   List<RequestModel> filteredBloodRequests = [];
+  List<RequestModel> todayRequests = [];
+  List<RequestModel> tomorrowRequests = [];
+  List<RequestModel> laterDaysRequests = [];
 
   final FirebaseDatabaseServices firebaseDatabaseServices =
       FirebaseDatabaseServices();
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _fetchAndFilterBloodRequest();
-  }
-
+  // Fetch and filter blood requests based on the selected filters
   Future<void> _fetchAndFilterBloodRequest() async {
     List<RequestModel> bloodRequests =
         await firebaseDatabaseServices.getAllBloodRequest();
-    _filterBloodRequest(bloodRequests);
+    _applyFilters(bloodRequests);
   }
 
-  void _filterBloodRequest(List<RequestModel> bloodRequests) {
+  void _applyFilters(List<RequestModel> bloodRequests) {
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+    DateTime tomorrow = today.add(const Duration(days: 1));
+
     setState(() {
       filteredBloodRequests = bloodRequests.where((bloodRequest) {
         bool matchesProvince = _selectedProvince == null ||
@@ -61,31 +59,29 @@ class _AllBloodRequestState extends State<AllBloodRequest>
             matchesLocalGovernment &&
             matchesBloodGroup;
       }).toList();
+
+      // Clear existing lists to avoid appending duplicates
+      todayRequests.clear();
+      tomorrowRequests.clear();
+      laterDaysRequests.clear();
+
+      // Populate todayRequests, tomorrowRequests, and laterDaysRequests
+      todayRequests.addAll(filteredBloodRequests.where((request) =>
+          DateTime.parse(request.requiredDate!).isAtSameMomentAs(today)));
+
+      tomorrowRequests.addAll(filteredBloodRequests.where((request) =>
+          DateTime.parse(request.requiredDate!).isAtSameMomentAs(tomorrow)));
+
+      laterDaysRequests.addAll(filteredBloodRequests.where((request) =>
+          DateTime.parse(request.requiredDate!).isAfter(tomorrow)));
     });
   }
 
-  List<List<RequestModel>> _filterBloodRequestsByDate() {
-    DateTime now = DateTime.now();
-    DateTime today = DateTime(now.year, now.month, now.day);
-    DateTime tomorrow = today.add(const Duration(days: 1));
-
-    List<RequestModel> todayRequests = [];
-    List<RequestModel> tomorrowRequests = [];
-    List<RequestModel> laterRequests = [];
-
-    for (var request in filteredBloodRequests) {
-      DateTime requestDate = DateTime.parse(request.requiredDate!); // Assuming `requiredDate` is in a valid format
-      if (requestDate.isAtSameMomentAs(today) ||
-          requestDate.isAfter(today) && requestDate.isBefore(tomorrow)) {
-        todayRequests.add(request);
-      } else if (requestDate.isAtSameMomentAs(tomorrow)) {
-        tomorrowRequests.add(request);
-      } else {
-        laterRequests.add(request);
-      }
-    }
-
-    return [todayRequests, tomorrowRequests, laterRequests];
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    _fetchAndFilterBloodRequest();
   }
 
   @override
@@ -95,187 +91,163 @@ class _AllBloodRequestState extends State<AllBloodRequest>
         appBar: AppBar(
           title: const Text(
             'All Blood Requests',
-            style: TextStyle(fontWeight: FontWeight.bold), // Bold title
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
           backgroundColor: Colors.red,
           centerTitle: true,
-          bottom: 
-                TabBar(
-                  labelColor: Colors.green, // Color for selected tab text
-                  unselectedLabelColor: const Color.fromARGB(255, 20, 19, 19), // Color for unselected tab text
-                  indicatorColor: Colors.green, // Color for the indicator line
-                  controller: _tabController,
-                  tabs: const [
-                    Tab(text: 'Today',),
-                    Tab(text: 'Tomorrow',),
-                    Tab(text: 'Later',),
-                  ],
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold), // Bold text in TabBar
-                  indicatorWeight: 3.0, // Thickness of the indicator line
-                  // Set the background color of the TabBar
-                  indicator: const BoxDecoration(
-                    // Background color of the TabBar
-                    border: Border(
-                      top: BorderSide(
-                        color: Colors.green, // Color of the top border
-                        width: 3.0, // Thickness of the top border
-                      ),
-                    ),
-                  ),
-                
-            
-            ),
-          
+          bottom: TabBar(
+            labelColor: Colors.green,
+            unselectedLabelColor: const Color.fromARGB(255, 20, 19, 19),
+            indicatorColor: Colors.green,
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'Today'),
+              Tab(text: 'Tomorrow'),
+              Tab(text: 'Later'),
+            ],
+            labelStyle: TextStyle(fontWeight: FontWeight.bold),
+            indicatorWeight: 3.0,
+          ),
         ),
-       
         body: Column(
           children: [
-            // fiter to select blood type district , province and local gov
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  // Blood Group Dropdown
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Blood Group',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.bloodtype),
-                    ),
-                    value: _selectedBloodGroup,
-                    items: BloodGroup.bloodGroups.map((String bloodGroup) {
-                      return DropdownMenuItem<String>(
-                        value: bloodGroup,
-                        child: Text(bloodGroup),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedBloodGroup = newValue;
-                      });
-                      _fetchAndFilterBloodRequest(); // Refetch blood requests
-                    },
-                    validator: (value) => null, // Allow the field to be optional
-                  ),
-                  const SizedBox(height: 4),
-
-                  // Province Dropdown
-                  DropdownButtonFormField<String>(
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Province',
-                      border: OutlineInputBorder(),
-                    ),
-                    value: _selectedProvince,
-                    items: LocationData.provinces.map((String province) {
-                      return DropdownMenuItem<String>(
-                        value: province,
-                        child: Text(province, overflow: TextOverflow.ellipsis),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedProvince = newValue;
-                        _districts = LocationData.districtMap[_selectedProvince] ?? [];
-                        _selectedDistrict = null;
-                        _selectedLocalGovernment = null;
-                        _localGovernments = [];
-                      });
-                      _fetchAndFilterBloodRequest(); // Refetch blood requests
-                    },
-                    validator: (value) => null,
-                  ),
-                  const SizedBox(height: 4),
-
-                  // District Dropdown
-                  DropdownButtonFormField<String>(
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'District',
-                      border: OutlineInputBorder(),
-                    ),
-                    value: _selectedDistrict,
-                    items: _districts.map((String district) {
-                      return DropdownMenuItem<String>(
-                        value: district,
-                        child: Text(district, overflow: TextOverflow.ellipsis),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedDistrict = newValue;
-                        _localGovernments = LocationData.localGovernmentMap[_selectedDistrict] ?? [];
-                        _selectedLocalGovernment = null;
-                      });
-                      _fetchAndFilterBloodRequest(); // Refetch blood requests
-                    },
-                    validator: (value) => null,
-                  ),
-                  const SizedBox(height: 4),
-
-                  // Local Government Dropdown
-                  DropdownButtonFormField<String>(
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Local Government',
-                      border: OutlineInputBorder(),
-                    ),
-                    value: _selectedLocalGovernment,
-                    items: _localGovernments.map((String localGov) {
-                      return DropdownMenuItem<String>(
-                        value: localGov,
-                        child: Text(localGov, overflow: TextOverflow.ellipsis),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedLocalGovernment = newValue;
-                      });
-                      _fetchAndFilterBloodRequest(); // Refetch blood requests
-                    },
-                    validator: (value) => null,
-                  ),
-                ],
-              ),
-            ),
+            // Filter dropdowns for blood type, district, province, and local gov
+            _buildFilterDropdowns(),
             const SizedBox(height: 10),
-
             Expanded(
-              child: FutureBuilder<List<RequestModel>>(
-                future: firebaseDatabaseServices.getAllBloodRequest(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text("Error: ${snapshot.error}"));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text("No blood requests found."));
-                  } else {
-                    // Update filteredBloodRequests with the latest data
-                    filteredBloodRequests = snapshot.data!;
-                    
-                    // Filter blood requests by date
-                    final filteredRequestsByDate = _filterBloodRequestsByDate();
-
-                    return TabBarView(
-                      controller: _tabController,
-                      children: [
-                        // Today Tab
-                        _buildRequestListView(filteredRequestsByDate[0]),
-                        // Tomorrow Tab
-                        _buildRequestListView(filteredRequestsByDate[1]),
-                        // Later Tab
-                        _buildRequestListView(filteredRequestsByDate[2]),
-                      ],
-                    );
-                  }
-                },
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildRequestListView(todayRequests),
+                  _buildRequestListView(tomorrowRequests),
+                  _buildRequestListView(laterDaysRequests),
+                ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFilterDropdowns() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        children: [
+          _buildBloodGroupDropdown(),
+          const SizedBox(height: 4),
+          _buildProvinceDropdown(),
+          const SizedBox(height: 4),
+          _buildDistrictDropdown(),
+          const SizedBox(height: 4),
+          _buildLocalGovernmentDropdown(),
+        ],
+      ),
+    );
+  }
+
+  // Blood Group Dropdown
+  DropdownButtonFormField<String> _buildBloodGroupDropdown() {
+    return DropdownButtonFormField<String>(
+      decoration: const InputDecoration(
+        labelText: 'Blood Group',
+        border: OutlineInputBorder(),
+        prefixIcon: Icon(Icons.bloodtype),
+      ),
+      value: _selectedBloodGroup,
+      items: BloodGroup.bloodGroups.map((String bloodGroup) {
+        return DropdownMenuItem<String>(
+          value: bloodGroup,
+          child: Text(bloodGroup),
+        );
+      }).toList(),
+      onChanged: (newValue) {
+        setState(() {
+          _selectedBloodGroup = newValue;
+        });
+        _fetchAndFilterBloodRequest(); // Refetch blood requests
+      },
+    );
+  }
+
+  // Province Dropdown
+  DropdownButtonFormField<String> _buildProvinceDropdown() {
+    return DropdownButtonFormField<String>(
+      isExpanded: true,
+      decoration: const InputDecoration(
+        labelText: 'Province',
+        border: OutlineInputBorder(),
+      ),
+      value: _selectedProvince,
+      items: LocationData.provinces.map((String province) {
+        return DropdownMenuItem<String>(
+          value: province,
+          child: Text(province),
+        );
+      }).toList(),
+      onChanged: (newValue) {
+        setState(() {
+          _selectedProvince = newValue;
+          _districts = LocationData.districtMap[_selectedProvince] ?? [];
+          _selectedDistrict = null;
+          _selectedLocalGovernment = null;
+          _localGovernments = [];
+        });
+        _fetchAndFilterBloodRequest();
+      },
+    );
+  }
+
+  // District Dropdown
+  DropdownButtonFormField<String> _buildDistrictDropdown() {
+    return DropdownButtonFormField<String>(
+      isExpanded: true,
+      decoration: const InputDecoration(
+        labelText: 'District',
+        border: OutlineInputBorder(),
+      ),
+      value: _selectedDistrict,
+      items: _districts.map((String district) {
+        return DropdownMenuItem<String>(
+          value: district,
+          child: Text(district),
+        );
+      }).toList(),
+      onChanged: (newValue) {
+        setState(() {
+          _selectedDistrict = newValue;
+          _localGovernments =
+              LocationData.localGovernmentMap[_selectedDistrict] ?? [];
+          _selectedLocalGovernment = null;
+        });
+        _fetchAndFilterBloodRequest();
+      },
+    );
+  }
+
+  // Local Government Dropdown
+  DropdownButtonFormField<String> _buildLocalGovernmentDropdown() {
+    return DropdownButtonFormField<String>(
+      isExpanded: true,
+      decoration: const InputDecoration(
+        labelText: 'Local Government',
+        border: OutlineInputBorder(),
+      ),
+      value: _selectedLocalGovernment,
+      items: _localGovernments.map((String localGov) {
+        return DropdownMenuItem<String>(
+          value: localGov,
+          child: Text(localGov),
+        );
+      }).toList(),
+      onChanged: (newValue) {
+        setState(() {
+          _selectedLocalGovernment = newValue;
+        });
+        _fetchAndFilterBloodRequest();
+      },
     );
   }
 
@@ -298,20 +270,12 @@ class _AllBloodRequestState extends State<AllBloodRequest>
             ),
             child: ListTile(
               contentPadding: const EdgeInsets.all(8),
-              title: Text(
-                  bloodRequest.bloodGroup ?? "Unknown blood type",
+              title: Text(bloodRequest.bloodGroup ?? "Unknown blood type",
                   style: const TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text(
                   "Phone number: ${bloodRequest.phoneNumber ?? "No phone number"}",
-                  style: const TextStyle(color: Color.fromARGB(255, 19, 18, 18))),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        BasicDetails(requestModel: bloodRequest),
-                  ),
-                );
-              },
+                  style:
+                      const TextStyle(color: Color.fromARGB(255, 114, 111, 111))),
             ),
           );
         },
@@ -319,6 +283,7 @@ class _AllBloodRequestState extends State<AllBloodRequest>
     }
   }
 }
+
 
 class BasicDetails extends StatelessWidget {
   const BasicDetails({super.key, required this.requestModel});
