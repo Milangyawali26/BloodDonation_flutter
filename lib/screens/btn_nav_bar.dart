@@ -19,10 +19,10 @@ class _BtmNavigationBarState extends State<BtmNavigationBar> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    HomePage(),
-    AllBloodRequest(),
-    Searchdonors(),
-    Profile(),
+    const HomePage(),
+    const AllBloodRequest(),
+     const Searchdonors(),
+    const Profile(),
   ];
 
   void _onItemTapped(int index) {

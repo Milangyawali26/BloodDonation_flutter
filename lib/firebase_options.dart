@@ -46,7 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '372617062510',
     projectId: 'blood-donation-app-57be3',
     authDomain: 'blood-donation-app-57be3.firebaseapp.com',
-    storageBucket: 'blood-donation-app-57be3.appspot.com',
+    storageBucket: 'blood-donation-app-57be3.firebasestorage.app',
     measurementId: 'G-4JQXCNEMDW',
   );
 
@@ -55,7 +55,7 @@ class DefaultFirebaseOptions {
     appId: '1:372617062510:android:f0e9a33e695b287a265e7f',
     messagingSenderId: '372617062510',
     projectId: 'blood-donation-app-57be3',
-    storageBucket: 'blood-donation-app-57be3.appspot.com',
+    storageBucket: 'blood-donation-app-57be3.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -63,7 +63,7 @@ class DefaultFirebaseOptions {
     appId: '1:372617062510:ios:6343b7911037eec9265e7f',
     messagingSenderId: '372617062510',
     projectId: 'blood-donation-app-57be3',
-    storageBucket: 'blood-donation-app-57be3.appspot.com',
+    storageBucket: 'blood-donation-app-57be3.firebasestorage.app',
     iosBundleId: 'com.example.bloodApp',
   );
 
@@ -72,7 +72,7 @@ class DefaultFirebaseOptions {
     appId: '1:372617062510:ios:6343b7911037eec9265e7f',
     messagingSenderId: '372617062510',
     projectId: 'blood-donation-app-57be3',
-    storageBucket: 'blood-donation-app-57be3.appspot.com',
+    storageBucket: 'blood-donation-app-57be3.firebasestorage.app',
     iosBundleId: 'com.example.bloodApp',
   );
 

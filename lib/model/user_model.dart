@@ -2,40 +2,43 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 class UserModel {
   String? id;
   String? fullName;
   String? signUpPhoneNumber;
   String? email;
+  String? fcmToken; // New field for FCM token
 
   UserModel({
     this.id,
     this.fullName,
     this.signUpPhoneNumber,
     this.email,
+    this.fcmToken, // Add fcmToken to constructor
   });
 
-  toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'fullName': fullName,
       'sign Up phoneNumber': signUpPhoneNumber,
       'email': email,
+      'fcmToken': fcmToken, // Include fcmToken in toJson
     };
   }
 
-factory UserModel.fromJson(DocumentSnapshot<Map<String, dynamic>> document) {
-  final userData = document.data()!;
-  return UserModel(
-    id: userData['id'],
-    fullName: userData['fullName'],
-    signUpPhoneNumber: userData['sign Up phoneNumber'],
-    email: userData['email'],
-  );
+  factory UserModel.fromJson(DocumentSnapshot<Map<String, dynamic>> document) {
+    final userData = document.data()!;
+    return UserModel(
+      id: userData['id'],
+      fullName: userData['fullName'],
+      signUpPhoneNumber: userData['sign Up phoneNumber'],
+      email: userData['email'],
+      fcmToken: userData['fcmToken'], // Add fcmToken to fromJson
+    );
+  }
 }
 
-}
 class DonorModel {
   bool? isAvailable;
   String? id;

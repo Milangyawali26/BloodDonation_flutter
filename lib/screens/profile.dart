@@ -67,7 +67,7 @@ class _ProfileState extends State<Profile> {
                             Navigator.of(context).pushReplacementNamed('/login');
                           },
                         ),
-                        SizedBox(width: 5,),
+                        const SizedBox(width: 5,),
                         InkWell(
                           child: const Text('Cancel'),
                           onTap: () {
@@ -98,6 +98,8 @@ class _ProfileState extends State<Profile> {
                         title: const Text('Phone Number'),
                         subtitle: Text(userModel!.signUpPhoneNumber ?? 'N/A'),
                       ),
+
+                      // btn to become donor
                       Container(
                         alignment: Alignment.topLeft,
                         padding: const EdgeInsets.only(top: 20),
@@ -118,6 +120,7 @@ class _ProfileState extends State<Profile> {
                           },
                         ),
                       ),
+                    
                       Container(
                         alignment: Alignment.topLeft,
                         padding: const EdgeInsets.only(top: 20),
@@ -160,6 +163,7 @@ class _ProfileState extends State<Profile> {
                           },
                         ),
                       ),
+                     
                       //my  all requests
                         Container(
                         alignment: Alignment.topLeft,

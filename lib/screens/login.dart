@@ -1,8 +1,11 @@
-import 'package:blood_app/firebase_authService.dart/firebase_auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../firebase_authService.dart/Wrapper.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -63,7 +66,7 @@ class _LoginState extends State<Login> {
                     controller: _passwordController,
                     keyboardType: TextInputType.visiblePassword,
                     maxLength: 20,
-                    obscureText: passwordVisible, // Variable name corrected
+                    obscureText: passwordVisible,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.lock),
                       suffixIcon: IconButton(
@@ -74,8 +77,7 @@ class _LoginState extends State<Login> {
                         ),
                         onPressed: () {
                           setState(() {
-                            passwordVisible =
-                                !passwordVisible; // Update the state
+                            passwordVisible = !passwordVisible;
                           });
                         },
                       ),
@@ -94,102 +96,93 @@ class _LoginState extends State<Login> {
                   const SizedBox(
                     height: 10,
                   ),
-      
-              
-                 const  SizedBox(
-                    height: 10,
-                  ),
-      
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const Text(
-                          "Don't have Account?",
-                          style: TextStyle(
-                              color:  Color.fromARGB(255, 184, 59, 206),
-                              fontStyle: FontStyle.italic),
-                        ),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pushNamed('/signup');
-                            },
-                            child: const Text(
-                              "SignUp",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ))
-                      ],
+                  // Login button
+                  SizedBox(
+                    height: 50,
+                    width: 300,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      onPressed: _loginWithEmailPassword,
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 10,),
-      
-              // Login button
-SizedBox(
-  height: 50,
-  width: 300,
-  child: ElevatedButton(
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.orange,
-    ),
-    onPressed: () async {
-      print("Login button clicked");
-      if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-        final firebaseAuthService = FirebaseAuthService();
-        final email = _emailAddressController.text;
-        final password = _passwordController.text;
-
-        try {
-          // Attempt to log in the user
-          final User? user = await firebaseAuthService
-              .loginInWithEmailAndPassword(email, password);
-
-          if (user != null) {
-            // Save user ID to shared preferences
-            final SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.setString('id', user.uid);
-
-            print('Login Success');
-            Navigator.of(context).pushReplacementNamed('/wrapper');
-          } else {
-            Get.snackbar("Error", 'please enter valid email and password', backgroundColor: Colors.redAccent, colorText: Colors.white);
-            print('Login failed: User not found');
-          }
-        } on FirebaseAuthException catch (e) {
-          // Handle specific Firebase authentication errors
-          String errorMessage;
-          if (e.code == 'user-not-found') {
-            errorMessage = 'No user found with this email.';
-          } else if (e.code == 'wrong-password') {
-            errorMessage = 'Incorrect password. Please try again.';
-          } else if (e.code == 'network-request-failed') {
-            errorMessage = 'Network error. Please check your connection.';
-          } else {
-            errorMessage = 'An unexpected error occurred: ${e.message}';
-          }
-          print('Login failed: $errorMessage');
-          Get.snackbar("Login Error", errorMessage, backgroundColor: Colors.white, colorText: Colors.redAccent);
-        } catch (e) {
-          // Handle any other errors
-          print('An unexpected error occurred: $e');
-          Get.snackbar("Error", 'An unexpected error occurred. Please try again.', backgroundColor: Colors.white, colorText: Colors.redAccent);
-        }
-      }
-    },
-    child: const Text(
-      "Login",
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-    ),
-  ),
-),
-           ],
+                ],
               ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _loginWithEmailPassword() async {
+    final userEmail = _emailAddressController.text.trim();
+    final userPassword = _passwordController.text.trim();
+
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        // Try to sign in the user with email and password
+        final userCredential = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(
+          email: userEmail,
+          password: userPassword,
+        );
+
+        // Get FCM token after successful login
+        String? fcmToken = await FirebaseMessaging.instance.getToken();
+
+        if (fcmToken != null) {
+          // Save FCM token to Firestore
+          await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).update({
+            'fcmToken': fcmToken,
+          });
+        }
+
+        // Store userId in SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('userId', userCredential.user?.uid ?? '');
+
+        // Navigate to the next screen
+        Get.offAll(const Wrapper());
+
+      } on FirebaseAuthException catch (e) {
+        // Handle Firebase Authentication errors
+        String errorMessage = 'An error occurred. Please try again.';
+        if (e.code == 'user-not-found') {
+          errorMessage = 'No user found with that email.';
+        } else if (e.code == 'wrong-password') {
+          errorMessage = 'Incorrect password. Please try again.';
+        }
+        Get.snackbar(
+          'Login Failed',
+          errorMessage,
+          backgroundColor: Colors.white,
+          colorText: Colors.redAccent,
+        );
+      } on FirebaseException catch (e) {
+        // Handle Firestore or Firebase Messaging errors
+        Get.snackbar(
+          'Error',
+          'Something went wrong with the database. Please try again later.',
+          backgroundColor: Colors.white,
+          colorText: Colors.redAccent,
+        );
+        print("Firestore error: ${e.message}");
+      } catch (e) {
+        // Catch all other exceptions
+        Get.snackbar(
+          'Login Failed',
+          'An unexpected error occurred. Please try again later.',
+          backgroundColor: Colors.white,
+          colorText: Colors.redAccent,
+        );
+        print("Unexpected error: $e");
+      }
+    }
   }
 }

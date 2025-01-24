@@ -18,7 +18,7 @@ class _SplashState extends State<Splash> {
  void initState() {
     super.initState();
     // Add a delay using Timer for 3 seconds
-    Timer(Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 3), () {
       // After the delay, navigate to the main page
       Navigator.pushReplacement(
         context,
@@ -30,8 +30,9 @@ class _SplashState extends State<Splash> {
   }
   
 
+  @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return const SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
         body:Center(

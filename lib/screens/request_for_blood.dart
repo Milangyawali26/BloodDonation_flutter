@@ -42,14 +42,14 @@ class _RequestForBloodState extends State<RequestForBlood> {
 
   // function to select date
   Future<void> _selectDate() async {
-    DateTime? _picked = await showDatePicker(
+    DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime(1900),
         lastDate: DateTime(2100));
-    if (_picked != null) {
+    if (picked != null) {
       setState(() {
-        _selectedDateController.text = _picked.toString().split(" ")[0];
+        _selectedDateController.text = picked.toString().split(" ")[0];
       });
     }
   }
@@ -82,8 +82,8 @@ class _RequestForBloodState extends State<RequestForBlood> {
             child: Column(
               children: [
                 Container(
-                  margin: EdgeInsets.all(4),
-                  padding: EdgeInsets.all(4),
+                  margin: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(4),
                   child: const Text(
                       "Fill all the field to request required blood . "),
                 ),

@@ -5,6 +5,8 @@ import '../firebase_authService.dart/firebase_dataBase_services.dart';
 import '../model/user_model.dart';
 
 class Searchdonors extends StatefulWidget {
+  const Searchdonors({super.key});
+
   @override
   _SearchdonorsState createState() => _SearchdonorsState();
 }
@@ -18,7 +20,6 @@ class _SearchdonorsState extends State<Searchdonors> {
   List<String> _districts = [];
   List<String> _localGovernments = [];
   List<DonorModel> filteredDonors = [];
- 
 
   final FirebaseDatabaseServices firebaseDatabaseServices =
       FirebaseDatabaseServices();

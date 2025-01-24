@@ -1,5 +1,3 @@
-import 'package:blood_app/firebase_authService.dart/Wrapper.dart';
-import 'package:blood_app/screens/donor_profile.dart';
 import 'package:blood_app/screens/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +9,11 @@ import 'locationService.dart';
 class FirebaseDatabaseServices {
   var bloodRequestList=[];
   final donorList = [];
+  List<DonorModel>? donorListCache;
   final _firestoreDb = FirebaseFirestore.instance;
+
+ 
+
 
   /// Create a user in Cloud Firestore
   void createUser({required UserModel userModel}) async {
@@ -137,9 +139,9 @@ class FirebaseDatabaseServices {
   Future<List<Map<String, dynamic>>> getDonorsInACollection() async {
     List<Map<String, dynamic>> donorList = []; // Initialize donorList here
     try {
-      final CollectionReference _donorsCollectionReference =
+      final CollectionReference donorsCollectionReference =
           _firestoreDb.collection('donors');
-      QuerySnapshot querySnapShot = await _donorsCollectionReference.get();
+      QuerySnapshot querySnapShot = await donorsCollectionReference.get();
 
       // Use map to convert documents into a list
       donorList = querySnapShot.docs
@@ -154,7 +156,9 @@ class FirebaseDatabaseServices {
   }
 
 
-// Function to calculate the Haversine distance between two points
+
+
+  // Function to calculate the Haversine distance between two points
   Future<double> calculateHaversineDistance(double donorLatitude,
       double donorLongitude, Position userPosition) async {
     const double earthRadius = 6371; // Radius of the Earth in kilometers
@@ -178,8 +182,12 @@ class FirebaseDatabaseServices {
 
 
 
-// Function to get donors from database and calculate distances
+  // Function to get donors from database and calculate distances
   Future<List<DonorModel>> getDonorsFromDatabase() async {
+    if (donorListCache != null) {
+      return donorListCache!; // Return cached list if available
+    }
+
     List<DonorModel> donorList = [];
     Position userPosition;
     try {
@@ -188,11 +196,10 @@ class FirebaseDatabaseServices {
 
       final CollectionReference donorsCollectionReference =
           _firestoreDb.collection('donors');
-          // Query to get only available donors
-    final QuerySnapshot<Object?> snapShot = await donorsCollectionReference
-        .where('isAvailable', isEqualTo: true) // Filter for available donors
-        .get();
-
+      // Query to get only available donors
+      final QuerySnapshot<Object?> snapShot = await donorsCollectionReference
+          .where('isAvailable', isEqualTo: true) // Filter for available donors
+          .get();
 
       if (snapShot.docs.isNotEmpty) {
         donorList = snapShot.docs
@@ -221,12 +228,20 @@ class FirebaseDatabaseServices {
 
       // Sort the donorList by distance in ascending order
       donorList.sort((a, b) => a.distance!.compareTo(b.distance!));
+
+      // Cache the donor list for future use
+      donorListCache = donorList;
+      print("the length of cached donor list ${donorListCache?.length}");
+
     } catch (e) {
       print('Something went wrong: $e');
     }
     return donorList;
   }
+
 // Example of the LocationService class to get the user's current location
+
+
 
 
 
@@ -236,13 +251,13 @@ class FirebaseDatabaseServices {
       required String uid,
       required DonorModel donorModel}) async {
     try {
-      final CollectionReference _usersCollectionReference =
-          await _firestoreDb.collection('donors');
+      final CollectionReference usersCollectionReference =
+          _firestoreDb.collection('donors');
       final documentSnapshot =
-          await _usersCollectionReference.where('id', isEqualTo: uid).get();
+          await usersCollectionReference.where('id', isEqualTo: uid).get();
       if (documentSnapshot.docs.isNotEmpty) {
         final documentId = documentSnapshot.docs.first.id;
-        await _usersCollectionReference
+        await usersCollectionReference
             .doc(documentId)
             .update(donorModel.toJson())
             .then((_) {
@@ -382,10 +397,10 @@ Future<RequestModel?>updateBloodRequestUsingId(
       required RequestModel requestModel}) async{
 
          try {
-      final CollectionReference _usersCollectionReference =
-          await _firestoreDb.collection('bloodRequest');
+      final CollectionReference usersCollectionReference =
+          _firestoreDb.collection('bloodRequest');
       final documentSnapshot =
-          await _usersCollectionReference.where('requestId', isEqualTo: requestId).get();
+          await usersCollectionReference.where('requestId', isEqualTo: requestId).get();
       if (documentSnapshot.docs.isNotEmpty) {
 
 
@@ -396,11 +411,11 @@ Future<RequestModel?>updateBloodRequestUsingId(
 
   // Update the document by adding requestId field
 
-        await _usersCollectionReference
+        await usersCollectionReference
             .doc(documentId)
             .update(requestModel.toJson());
 
-         await _usersCollectionReference
+         await usersCollectionReference
             .doc(documentId)
             .update({'requestId': documentId,});            
             {
@@ -423,7 +438,7 @@ Future<RequestModel?>updateBloodRequestUsingId(
               ],
             ),
           );
-        };
+        }
       } else {
         print("request not found here ");
        // return null;

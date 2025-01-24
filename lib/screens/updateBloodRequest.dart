@@ -48,14 +48,14 @@ class _UpdateBloodRequestState extends State<UpdateBloodRequest> {
 
   // function to select date
   Future<void> _selectDate() async {
-    DateTime? _picked = await showDatePicker(
+    DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime(1900),
         lastDate: DateTime(2100));
-    if (_picked != null) {
+    if (picked != null) {
       setState(() {
-        _selectedDateController.text = _picked.toString().split(" ")[0];
+        _selectedDateController.text = picked.toString().split(" ")[0];
       });
     }
   }

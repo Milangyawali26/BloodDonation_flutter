@@ -1,8 +1,7 @@
 import 'package:blood_app/firebase_authService.dart/firebase_dataBase_services.dart';
 import 'package:blood_app/model/user_model.dart';
-import 'package:blood_app/screens/updateBloodRequest.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For date formatting
+// For date formatting
 import '../constants/bloodgroups.dart';
 import '../constants/province_district_localgovern_data.dart';
 
@@ -105,7 +104,7 @@ class _AllBloodRequestState extends State<AllBloodRequest>
               Tab(text: 'Tomorrow'),
               Tab(text: 'Later'),
             ],
-            labelStyle: TextStyle(fontWeight: FontWeight.bold),
+            labelStyle: const TextStyle(fontWeight: FontWeight.bold),
             indicatorWeight: 3.0,
           ),
         ),
@@ -276,6 +275,15 @@ class _AllBloodRequestState extends State<AllBloodRequest>
                   "Phone number: ${bloodRequest.phoneNumber ?? "No phone number"}",
                   style:
                       const TextStyle(color: Color.fromARGB(255, 114, 111, 111))),
+
+                        onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      BasicDetails(requestModel:bloodRequest),
+                                ),
+                              );
+                            },
             ),
           );
         },

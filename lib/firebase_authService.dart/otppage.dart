@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OtpPage extends StatefulWidget {
   final String verificationId;
@@ -56,6 +58,9 @@ class _OtpPageState extends State<OtpPage> {
       );
 
       if (user != null) {
+        // Get FCM token after successful login/signup
+        String? fcmToken = await FirebaseMessaging.instance.getToken();
+
         // Create a new user model with the provided details
         final userModel = UserModel(
           id: user.uid,
@@ -63,7 +68,16 @@ class _OtpPageState extends State<OtpPage> {
           signUpPhoneNumber: widget.signUpPhoneNumber,
           email: widget.email,
         );
+
+        // Store user data in Firestore
         FirebaseDatabaseServices().createUser(userModel: userModel);
+
+        // Store the FCM token in Firestore
+        if (fcmToken != null) {
+          await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+            'fcmToken': fcmToken, // Save FCM token to Firestore
+          });
+        }
 
         // Navigate to the home page or dashboard after successful signup
         Get.offAll(const Wrapper());
@@ -115,51 +129,49 @@ class _OtpPageState extends State<OtpPage> {
       body: SingleChildScrollView(
         child: Center(
           child: Column(
-               children: [
-            Image.asset(
-              "assets/otpImage.png",
-              height: 300,
-              width: 300,
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              "OTP Verification",
-              style: TextStyle(fontSize: 30),
-            ),
-            const SizedBox(height: 10),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-              child: Text(
-                "Enter the OTP sent to your number",
-                textAlign: TextAlign.center,
+            children: [
+              Image.asset(
+                "assets/otpImage.png",
+                height: 300,
+                width: 300,
               ),
-            ),
-            const SizedBox(height: 50),
-            textcode(),
-            const SizedBox(height: 50),
-            ElevatedButton(
-              onPressed: () {
-                signIn();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+              const SizedBox(height: 10),
+              const Text(
+                "OTP Verification",
+                style: TextStyle(fontSize: 30),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 80),
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 8),
                 child: Text(
-                  'Verify and proceed',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                  "Enter the OTP sent to your number",
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 50),
+              textcode(),
+              const SizedBox(height: 50),
+              ElevatedButton(
+                onPressed: () {
+                  signIn();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 80),
+                  child: Text(
+                    'Verify and proceed',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
-      
+            ],
           ),
-       
         ),
       ),
     );

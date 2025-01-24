@@ -32,14 +32,14 @@ class _DonorRegisterState extends State<DonorRegister> {
 
 // function to select date of birth
   Future<void> _selectBirthDate() async {
-    DateTime? _picked = await showDatePicker(
+    DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime(1900),
         lastDate: DateTime(2100));
-    if (_picked != null) {
+    if (picked != null) {
       setState(() {
-        _dateOfBirthController.text = _picked.toString().split(" ")[0];
+        _dateOfBirthController.text = picked.toString().split(" ")[0];
       });
     }
   }
@@ -48,7 +48,7 @@ class _DonorRegisterState extends State<DonorRegister> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Become a Donor"),
+          title: const Text("Become a Donor",style: TextStyle(color: Colors.white),),
           centerTitle: true,
           backgroundColor: Colors.red,
         ),
