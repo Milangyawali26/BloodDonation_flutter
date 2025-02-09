@@ -255,17 +255,19 @@ class FirebaseDatabaseServices {
       {required BuildContext context,
       required String uid,
       required DonorModel donorModel}) async {
+
     try {
       final CollectionReference usersCollectionReference =
           _firestoreDb.collection('donors');
       final documentSnapshot =
           await usersCollectionReference.where('id', isEqualTo: uid).get();
-      if (documentSnapshot.docs.isNotEmpty) {
+      if (documentSnapshot.docs.isNotEmpty) { 
         final documentId = documentSnapshot.docs.first.id;
         await usersCollectionReference
             .doc(documentId)
             .update(donorModel.toJson())
-            .then((_) {
+            .then((_)
+             {
           showDialog(
             context: context,
             builder: (ctx) => AlertDialog(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../firebase_authService.dart/firebase_dataBase_services.dart';
-import '../firebase_authService.dart/firebase_msgServices.dart';
+import '../firebase_Service.dart/firebase_dataBase_services.dart';
+import '../firebase_Service.dart/firebase_msgServices.dart';
 import 'updateBloodRequest.dart';
 import '../model/user_model.dart';
 
@@ -181,8 +181,7 @@ class BasicDetails extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text('Blood Group: ${requestModel.bloodGroup ?? "-"}'),
                 const SizedBox(height: 5),
-                Text(
-                    'Contact Person Name: ${requestModel.contactPersonName ?? "-"}'),
+                Text('Contact Person Name: ${requestModel.contactPersonName ?? "-"}'),
                 const SizedBox(height: 5),
                 Text('Phone: ${requestModel.phoneNumber ?? "-"}'),
                 const SizedBox(height: 5),
@@ -200,8 +199,7 @@ class BasicDetails extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text('District: ${requestModel.district ?? "-"}'),
                 const SizedBox(height: 5),
-                Text(
-                    'Local Government: ${requestModel.localGovernment ?? "-"}'),
+                Text('Local Government: ${requestModel.localGovernment ?? "-"}'),
                 const SizedBox(height: 5),
                 Text('Request ID: ${requestModel.requestId ?? "-"}'),
               ],

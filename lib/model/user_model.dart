@@ -39,6 +39,8 @@ class UserModel {
   }
 }
 
+
+
 class DonorModel {
   bool? isAvailable;
   String? id;
@@ -54,6 +56,15 @@ class DonorModel {
   double? longitude;
   double? distance;
 
+
+  // New attributes
+  DateTime? lastDonationDate;
+  int totalDonations; // Frequency (times)
+  int totalMonetary; // Total volume in c.c.
+  DateTime? firstDonationDate;
+  List<Map<String, dynamic>> donationHistory; // List to store donation history
+
+
   DonorModel({
     this.isAvailable,
     this.id,
@@ -68,8 +79,14 @@ class DonorModel {
     this.latitude,
     this.longitude,
     this.distance,
+    this.lastDonationDate,
+    this.totalDonations = 0,
+    this.totalMonetary = 0,
+    this.firstDonationDate,
+    this.donationHistory = const [],
 
   });
+
 
   Map<String, dynamic> toJson() {
     return {
@@ -86,6 +103,11 @@ class DonorModel {
       'latitude': latitude,
       'longitude': longitude,
       'distance':distance,
+       'lastDonationDate': lastDonationDate?.toIso8601String(),
+      'totalDonations': totalDonations,
+      'totalMonetary': totalMonetary,
+      'firstDonationDate': firstDonationDate?.toIso8601String(),
+      'donationHistory': donationHistory,
     };
   }
 
@@ -105,9 +127,19 @@ class DonorModel {
       latitude: donorData['latitude'],
       longitude: donorData['longitude'],
       distance: donorData['distance'],
+         lastDonationDate: donorData['lastDonationDate'] != null ? DateTime.parse(donorData['lastDonationDate']) : null,
+      totalDonations: donorData['totalDonations'] ?? 0,
+      totalMonetary: donorData['totalMonetary'] ?? 0,
+      firstDonationDate: donorData['firstDonationDate'] != null ? DateTime.parse(donorData['firstDonationDate']) : null,
+      donationHistory: List<Map<String, dynamic>>.from(donorData['donationHistory'] ?? []),
+
     );
   }
+
 }
+
+
+
 
 class RequestModel{
   String? userId;

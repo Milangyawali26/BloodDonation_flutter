@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import '../firebase_authService.dart/otppage.dart';
+import '../firebase_Service.dart/otppage.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});

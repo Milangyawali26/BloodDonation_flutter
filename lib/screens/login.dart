@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../firebase_authService.dart/Wrapper.dart';
+import '../firebase_Service.dart/Wrapper.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});

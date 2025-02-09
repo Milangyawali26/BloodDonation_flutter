@@ -1,10 +1,10 @@
-import 'package:blood_app/firebase_authService.dart/firebase_dataBase_services.dart';
+import 'package:blood_app/firebase_Service.dart/firebase_dataBase_services.dart';
 import 'package:blood_app/screens/donor_profile.dart';
 import 'package:blood_app/screens/myBloodRequest.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:blood_app/model/user_model.dart';
-import '../firebase_authService.dart/firebase_auth_service.dart';
+import '../firebase_Service.dart/firebase_auth_service.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
