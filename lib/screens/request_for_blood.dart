@@ -94,6 +94,11 @@ class _RequestForBloodState extends State<RequestForBlood> {
                     TextFormField(
                       controller: _patientNameController,
                       keyboardType: TextInputType.name,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^[a-zA-Z\s]*$'),
+                        ), // Allows only letters and spaces
+                      ],
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Enter Patient  Full name',
@@ -111,6 +116,11 @@ class _RequestForBloodState extends State<RequestForBlood> {
                     TextFormField(
                       controller: _contactPersonNameController,
                       keyboardType: TextInputType.name,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^[a-zA-Z\s]*$'),
+                        ), // Allows only letters and spaces
+                      ],
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Enter contact person full name',
@@ -368,38 +378,35 @@ class _RequestForBloodState extends State<RequestForBlood> {
                       if (_formKey.currentState != null) {
                         if (_formKey.currentState!.validate()) {
                           try {
-                            User? currentUser = FirebaseAuth.instance.currentUser;
-      
+                            User? currentUser =
+                                FirebaseAuth.instance.currentUser;
+                            print('${FirebaseAuth.instance.currentUser}');
                             if (currentUser != null) {
                               final requestModel = RequestModel(
-                               
-                                  userId: currentUser.uid,
-                                  patientName: _patientNameController.text,
-                                  gender:_selectedGender,
-                                  contactPersonName: _contactPersonNameController.text,
-                                  phoneNumber: _phoneNumberController.text,
-                                  hospitalName: _hospitalNameController.text,
-                                  bloodGroup: _selectedBloodGroup,
-                                  requiredPint: _requiredPintController.text,
-                                  caseDetail: _caseDetailController.text,
-                                  province: _selectedProvince,
-                                  district: _selectedDistrict,
-                                  localGovernment: _selectedLocalGovernment,
-                                  requiredDate:_selectedDateController.text,
-                                  requiredTime: _selectedTimeController.text,
-                                 
-                                  
-                                 
-                                  );
-      
+                                userId: currentUser.uid,
+                                patientName: _patientNameController.text,
+                                gender: _selectedGender,
+                                contactPersonName:
+                                    _contactPersonNameController.text,
+                                phoneNumber: _phoneNumberController.text,
+                                hospitalName: _hospitalNameController.text,
+                                bloodGroup: _selectedBloodGroup,
+                                requiredPint: _requiredPintController.text,
+                                caseDetail: _caseDetailController.text,
+                                province: _selectedProvince,
+                                district: _selectedDistrict,
+                                localGovernment: _selectedLocalGovernment,
+                                requiredDate: _selectedDateController.text,
+                                requiredTime: _selectedTimeController.text,
+                              );
+
                               FirebaseDatabaseServices().addRequest(
                                   requestModel: requestModel, context: context);
-      
                             }
                           } catch (e) {
                             Get.snackbar('Error Occured', e.toString());
                           }
-      
+
                           // function to save data to data
                         }
                       }

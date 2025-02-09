@@ -14,14 +14,15 @@ class MyBloodRequest extends StatefulWidget {
 }
 
 class _MyBloodRequestState extends State<MyBloodRequest> {
-  final FirebaseDatabaseServices _firebaseDatabaseServices = FirebaseDatabaseServices();
-   final FirebaseMsgServices _firebaseMsgServices = FirebaseMsgServices();  // Create an instance of FirebaseMsgServices
+  final FirebaseDatabaseServices _firebaseDatabaseServices =
+      FirebaseDatabaseServices();
+  final FirebaseMsgServices _firebaseMsgServices =
+      FirebaseMsgServices(); // Create an instance of FirebaseMsgServices
   User? currentUser = FirebaseAuth.instance.currentUser;
   List<RequestModel> requests = [];
   List<DonorModel> compatibleDonors = [];
   bool _isLoading = true;
   double selectedRadius = 10.0; // default radius
-
 
   Future<void> fetchRequestDetails() async {
     if (currentUser != null) {
@@ -36,11 +37,12 @@ class _MyBloodRequestState extends State<MyBloodRequest> {
     }
   }
 
-
-  Future<List<DonorModel>> getFilteredDonors(String bloodGroup, double radius) async {
+  Future<List<DonorModel>> getFilteredDonors(
+      String bloodGroup, double radius) async {
     try {
       // Get all donors
-      List<DonorModel> allDonors = await _firebaseDatabaseServices.getDonorsFromDatabase();
+      List<DonorModel> allDonors =
+          await _firebaseDatabaseServices.getDonorsFromDatabase();
 
       // Define compatibility rules for blood donation
       Map<String, List<String>> compatibility = {
@@ -57,7 +59,7 @@ class _MyBloodRequestState extends State<MyBloodRequest> {
       // Check compatibility and filter donors by blood group and radius
       List<DonorModel> filteredDonors = allDonors.where((donor) {
         return compatibility[bloodGroup]?.contains(donor.bloodGroup) == true &&
-               donor.distance! <= radius;
+            donor.distance! <= radius;
       }).toList();
 
       print('Number of compatible donors: ${filteredDonors.length}');
@@ -102,7 +104,8 @@ class _MyBloodRequestState extends State<MyBloodRequest> {
                           child: const Text(
                             'Make a Blood Request',
                             style: TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.bold),
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           ),
                           onPressed: () {
                             Navigator.of(context).pushNamed('/addRequest');
@@ -111,18 +114,20 @@ class _MyBloodRequestState extends State<MyBloodRequest> {
                       ],
                     ),
                   )
-              : ListView.builder(
+                : ListView.builder(
                     itemCount: requests.length,
                     itemBuilder: (context, index) {
                       return BasicDetails(
                         requestModel: requests[index],
-                        getFilteredDonors: getFilteredDonors, // Pass the function here
+                        getFilteredDonors:
+                            getFilteredDonors, // Pass the function here
                         onUpdateCompatibleDonors: (donors) {
                           setState(() {
                             compatibleDonors = donors;
                           });
                         },
-                        sendNotifications: _firebaseMsgServices.sendNotificationsToDonors, // Pass instance method here
+                        sendNotifications: _firebaseMsgServices
+                            .sendNotificationsToDonors, // Pass instance method here
                       );
                     },
                   ),
@@ -176,7 +181,8 @@ class BasicDetails extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text('Blood Group: ${requestModel.bloodGroup ?? "-"}'),
                 const SizedBox(height: 5),
-                Text('Contact Person Name: ${requestModel.contactPersonName ?? "-"}'),
+                Text(
+                    'Contact Person Name: ${requestModel.contactPersonName ?? "-"}'),
                 const SizedBox(height: 5),
                 Text('Phone: ${requestModel.phoneNumber ?? "-"}'),
                 const SizedBox(height: 5),
@@ -194,7 +200,8 @@ class BasicDetails extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text('District: ${requestModel.district ?? "-"}'),
                 const SizedBox(height: 5),
-                Text('Local Government: ${requestModel.localGovernment ?? "-"}'),
+                Text(
+                    'Local Government: ${requestModel.localGovernment ?? "-"}'),
                 const SizedBox(height: 5),
                 Text('Request ID: ${requestModel.requestId ?? "-"}'),
               ],
@@ -211,7 +218,8 @@ class BasicDetails extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UpdateBloodRequest(requestId: requestId),
+                    builder: (context) =>
+                        UpdateBloodRequest(requestId: requestId),
                   ),
                 );
               },
@@ -243,7 +251,12 @@ class BasicDetails extends StatelessWidget {
           Positioned(
             top: 130.0,
             right: 30.0,
-            child: urgentButton(context, requestModel, getFilteredDonors, onUpdateCompatibleDonors,sendNotifications), // Pass the function and callback here
+            child: urgentButton(
+                context,
+                requestModel,
+                getFilteredDonors,
+                onUpdateCompatibleDonors,
+                sendNotifications), // Pass the function and callback here
           ),
         ],
       ),
@@ -295,30 +308,33 @@ Widget urgentButton(
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Close without returning a value
+                  Navigator.of(context)
+                      .pop(); // Close without returning a value
                 },
                 child: const Text("Cancel"),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  Navigator.of(context).pop(selectedRadius); // Return the selected radius
-                  List<DonorModel> filteredDonors = await getFilteredDonors(requestModel.bloodGroup ?? "", selectedRadius);
-                  onUpdateCompatibleDonors(filteredDonors); // Update the donors list in the parent widget
+                  Navigator.of(context)
+                      .pop(selectedRadius); // Return the selected radius
+                  List<DonorModel> filteredDonors = await getFilteredDonors(
+                      requestModel.bloodGroup ?? "", selectedRadius);
+                  onUpdateCompatibleDonors(
+                      filteredDonors); // Update the donors list in the parent widget
+
+                  // Collect userIds of compatible donors
+                  List<String> userIds = filteredDonors
+                      .map((donor) => donor.id!)
+                      .toList(); // Use donor.id
+
+                  print(
+                      "number of conpatible donors of which userIds  collected ${userIds.length}");
                   
+                  // Send notifications to the compatible donors
+                  await sendNotifications(userIds,
+                      'Blood request: ${requestModel.patientName} needs blood.');
 
-      // Collect userIds of compatible donors
-      List<String> userIds = filteredDonors.map((donor) => donor.id!).toList(); // Use donor.id
-
-    print("number of conpatible donors of which userIds  collected ${userIds.length}");
-
-
-
-      // Send notifications to the compatible donors
-      await sendNotifications(userIds, 'Blood request: ${requestModel.patientName} needs blood.');
-
-      Navigator.pop(context);
-
-
+                  Navigator.pop(context);
                 },
                 child: const Text("Confirm"),
               ),

@@ -1,9 +1,11 @@
 import 'package:blood_app/screens/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:blood_app/model/user_model.dart';
+
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'dart:math';
+import '../model/user_model.dart';
 import 'locationService.dart';
 
 class FirebaseDatabaseServices {
@@ -21,9 +23,11 @@ class FirebaseDatabaseServices {
       final CollectionReference usersCollectionReference =
           _firestoreDb.collection('users');
       await usersCollectionReference.doc(userModel.id).set(userModel.toJson());
+      Get.snackbar("   Success"  , "user created ");
       print('User Creation Success');
     } catch (e) {
-      print('Something went wrong $e');
+      Get.snackbar("failed "  , "user not created in database ");
+      print(' user creation on database failed . Something went wrong $e');
     }
   }
 
@@ -86,6 +90,7 @@ class FirebaseDatabaseServices {
       }
     } catch (e) {
       print('Something went wrong $e');
+      Get.snackbar("failed "  , "donor registration failed. ");
     }
   }
 

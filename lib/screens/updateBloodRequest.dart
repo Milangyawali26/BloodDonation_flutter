@@ -10,19 +10,18 @@ import '../firebase_authService.dart/firebase_dataBase_services.dart';
 import '../model/user_model.dart';
 
 class UpdateBloodRequest extends StatefulWidget {
-  const UpdateBloodRequest({super.key,required this.requestId});
+  const UpdateBloodRequest({super.key, required this.requestId});
 
   final String requestId;
- 
+
   @override
   State<UpdateBloodRequest> createState() => _UpdateBloodRequestState();
 }
 
 class _UpdateBloodRequestState extends State<UpdateBloodRequest> {
-  
   late String _requestId;
 
-    final FirebaseDatabaseServices firebaseDatabaseServices =
+  final FirebaseDatabaseServices firebaseDatabaseServices =
       FirebaseDatabaseServices();
 
   final _formKey = GlobalKey<FormState>();
@@ -73,7 +72,7 @@ class _UpdateBloodRequestState extends State<UpdateBloodRequest> {
     }
   }
 
-    @override
+  @override
   void initState() {
     super.initState();
     _requestId = widget.requestId;
@@ -82,18 +81,23 @@ class _UpdateBloodRequestState extends State<UpdateBloodRequest> {
     _loadBloodRequestData(); // Call the function to load data
   }
 
-//fetching from the initial widget 
-Future<void> _loadBloodRequestData() async{
-  User? currentUser=FirebaseAuth.instance.currentUser;
-  if(currentUser!= null){
-    // fetch the request model using uid and request id
-    RequestModel? requestModel = await firebaseDatabaseServices.fetchBloodRequest(uid:currentUser.uid,requestId:_requestId,);
-    //
- if (requestModel != null) {
+//fetching from the initial widget
+  Future<void> _loadBloodRequestData() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      // fetch the request model using uid and request id
+      RequestModel? requestModel =
+          await firebaseDatabaseServices.fetchBloodRequest(
+        uid: currentUser.uid,
+        requestId: _requestId,
+      );
+      //
+      if (requestModel != null) {
         // Populate the fields with the fetched data
         setState(() {
           _patientNameController.text = requestModel.patientName ?? '';
-          _contactPersonNameController.text = requestModel.contactPersonName ?? '';
+          _contactPersonNameController.text =
+              requestModel.contactPersonName ?? '';
           _phoneNumberController.text = requestModel.phoneNumber ?? '';
           _hospitalNameController.text = requestModel.hospitalName ?? '';
           _requiredPintController.text = requestModel.requiredPint ?? '';
@@ -107,13 +111,11 @@ Future<void> _loadBloodRequestData() async{
           _caseDetailController.text = requestModel.caseDetail ?? '';
         });
       } else {
-        
         print("No blood request found for the provided ID");
         Get.snackbar('Error', 'No blood request found for the provided ID');
       }
-
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +131,6 @@ Future<void> _loadBloodRequestData() async{
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                
                 Form(
                   key: _formKey,
                   child: Column(children: [
@@ -137,6 +138,11 @@ Future<void> _loadBloodRequestData() async{
                     TextFormField(
                       controller: _patientNameController,
                       keyboardType: TextInputType.name,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^[a-zA-Z\s]*$'),
+                        ), // Allows only letters and spaces
+                      ],
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Enter Patient  Full name',
@@ -154,6 +160,11 @@ Future<void> _loadBloodRequestData() async{
                     TextFormField(
                       controller: _contactPersonNameController,
                       keyboardType: TextInputType.name,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^[a-zA-Z\s]*$'),
+                        ), // Allows only letters and spaces
+                      ],
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Enter contact person full name',
@@ -411,40 +422,40 @@ Future<void> _loadBloodRequestData() async{
                       if (_formKey.currentState != null) {
                         if (_formKey.currentState!.validate()) {
                           try {
-                            User? currentUser = FirebaseAuth.instance.currentUser;
-      
+                            User? currentUser =
+                                FirebaseAuth.instance.currentUser;
+
                             if (currentUser != null) {
                               final requestModel = RequestModel(
-                               
-                                  userId: currentUser.uid,
-                                  patientName: _patientNameController.text,
-                                  gender:_selectedGender,
-                                  contactPersonName: _contactPersonNameController.text,
-                                  phoneNumber: _phoneNumberController.text,
-                                  hospitalName: _hospitalNameController.text,
-                                  bloodGroup: _selectedBloodGroup,
-                                  requiredPint: _requiredPintController.text,
-                                  caseDetail: _caseDetailController.text,
-                                  province: _selectedProvince,
-                                  district: _selectedDistrict,
-                                  localGovernment: _selectedLocalGovernment,
-                                  requiredDate:_selectedDateController.text,
-                                  requiredTime: _selectedTimeController.text,
-                                 
-                                  
-                                 
-                                  );
-      
-                            // call the update method with uid and request id 
-                            await firebaseDatabaseServices.updateBloodRequestUsingId(context: context, uid: currentUser.uid, 
-                            requestId:widget.requestId,
-                            requestModel: requestModel);
-      
+                                userId: currentUser.uid,
+                                patientName: _patientNameController.text,
+                                gender: _selectedGender,
+                                contactPersonName:
+                                    _contactPersonNameController.text,
+                                phoneNumber: _phoneNumberController.text,
+                                hospitalName: _hospitalNameController.text,
+                                bloodGroup: _selectedBloodGroup,
+                                requiredPint: _requiredPintController.text,
+                                caseDetail: _caseDetailController.text,
+                                province: _selectedProvince,
+                                district: _selectedDistrict,
+                                localGovernment: _selectedLocalGovernment,
+                                requiredDate: _selectedDateController.text,
+                                requiredTime: _selectedTimeController.text,
+                              );
+
+                              // call the update method with uid and request id
+                              await firebaseDatabaseServices
+                                  .updateBloodRequestUsingId(
+                                      context: context,
+                                      uid: currentUser.uid,
+                                      requestId: widget.requestId,
+                                      requestModel: requestModel);
                             }
                           } catch (e) {
                             Get.snackbar('Error Occured', e.toString());
                           }
-      
+
                           // function to save data to data
                         }
                       }

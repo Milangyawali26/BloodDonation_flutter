@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class FirebaseMsgServices {
+  
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -93,7 +96,7 @@ Future<void> _showNotification(String? title, String? body) async {
     body,
     notificationDetails,
   );
-}
+ }
 
   // Fetch FCM tokens for a list of userIds from Firestore
   Future<List<String>> _getFcmTokensForDonors(List<String> userIds) async {
@@ -123,12 +126,25 @@ Future<void> _showNotification(String? title, String? body) async {
     String requestDetails,
   ) async {
     try {
-      List<String> tokens = await _getFcmTokensForDonors(userIds);
 
+      List<String> tokens = await _getFcmTokensForDonors(userIds);
+  Get.snackbar(
+          'notification sent',
+          'U  have  succssfully sent notification to  ${tokens.length} donors .',
+          backgroundColor: Colors.white,
+          colorText: Colors.green,
+          );
       if (tokens.isNotEmpty) {
         for (String token in tokens) {
           await _sendNotification(token, requestDetails);
         }
+         Get.snackbar(
+          'notification sent',
+          'U  have  succssfully sent notification to  ${tokens.length} donors .',
+          backgroundColor: Colors.white,
+          colorText: Colors.green,
+          );
+
         print('Notifications sent to ${tokens.length} donors');
       } else {
         print('No valid tokens found for the donors.');

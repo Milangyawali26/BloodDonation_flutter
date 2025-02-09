@@ -1,9 +1,9 @@
 
 import 'package:blood_app/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:firebase_core/firebase_core.dart';
-
 import 'firebase_authService.dart/Wrapper.dart';
 import 'screens/become_donor.dart';
 import 'screens/btn_nav_bar.dart';
@@ -24,19 +24,17 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-//   // Initialize Firebase messaging service 
-//   FirebaseMsgServices firebaseMsgServices = FirebaseMsgServices();
-//   await firebaseMsgServices.initializeMessaging();
+  // // Initialize Firebase messaging service 
+  // FirebaseMsgServices firebaseMsgServices = FirebaseMsgServices();
+  // await firebaseMsgServices.initializeMessaging();
 
-//   runApp(const MyApp());
-// }
+  runApp(const MyApp());
+}
 
 
 // Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 //   print('Handling background message: ${message.messageId}');
-
-
-}
+// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -49,7 +47,7 @@ class MyApp extends StatelessWidget {
         colorSchemeSeed: const Color.fromARGB(255, 92, 9, 9),
       ),
       routes: {
-       '/': (context) => const Splash(),
+       '/splash': (context) => const Splash(),
         '/wrapper': (context) => const Wrapper(),
         '/btm_nav_bar': (context) => const BtmNavigationBar(),
         '/login': (context) => const Login(),
@@ -61,8 +59,9 @@ class MyApp extends StatelessWidget {
         '/myBloodRequest': (context) => const MyBloodRequest(),
         '/addRequest': (context) => const RequestForBlood(),
       },
-      initialRoute: '/',
+      initialRoute: '/splash',
       debugShowCheckedModeBanner: false,
     );
   }
 }
+

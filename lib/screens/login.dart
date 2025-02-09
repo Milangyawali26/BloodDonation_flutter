@@ -18,7 +18,7 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _emailRegexPattern =
-      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@gmail.com";
   final _emailAddressController = TextEditingController();
 
   bool passwordVisible = true;
@@ -107,8 +107,31 @@ class _LoginState extends State<Login> {
                       onPressed: _loginWithEmailPassword,
                       child: const Text(
                         'Login',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18,color:Colors.white),
                       ),
+                    ),
+                  ),
+                  SizedBox(height: 20,),
+                   Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Text(
+                          "Don't have Account?",
+                          style: TextStyle(
+                              color: Color.fromARGB(255, 212, 49, 49),
+                              
+                              fontStyle: FontStyle.italic),
+                        ),
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pushNamed('/signup');
+                            },
+                            child: const Text(
+                              "SignUp",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ))
+                      ],
                     ),
                   ),
                 ],
@@ -135,7 +158,6 @@ class _LoginState extends State<Login> {
 
         // Get FCM token after successful login
         String? fcmToken = await FirebaseMessaging.instance.getToken();
-
         if (fcmToken != null) {
           // Save FCM token to Firestore
           await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).update({
@@ -149,6 +171,12 @@ class _LoginState extends State<Login> {
 
         // Navigate to the next screen
         Get.offAll(const Wrapper());
+          Get.snackbar(
+          'Login Success',
+          'u are succssfully login',
+          backgroundColor: Colors.white,
+          colorText: Colors.green,
+          );
 
       } on FirebaseAuthException catch (e) {
         // Handle Firebase Authentication errors
@@ -168,7 +196,7 @@ class _LoginState extends State<Login> {
         // Handle Firestore or Firebase Messaging errors
         Get.snackbar(
           'Error',
-          'Something went wrong with the database. Please try again later.',
+          'allow notification permission on your device !!',
           backgroundColor: Colors.white,
           colorText: Colors.redAccent,
         );

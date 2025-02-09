@@ -19,7 +19,7 @@ class _SignUpState extends State<SignUp> {
   final _signupPhoneNumberController = TextEditingController();
   final _passwordController = TextEditingController();
   final _emailRegexPattern =
-      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@gmail.com";
   final _emailAddressController = TextEditingController();
 
   Future<void> sendcode() async {
@@ -63,7 +63,7 @@ class _SignUpState extends State<SignUp> {
         },
       );
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Error Occurred", e.message ?? 'Unexpected error',
+      Get.snackbar("Error Occurred", e.message ?? 'data base issue  error',
           backgroundColor: Colors.redAccent, colorText: Colors.white);
     } catch (e) {
       Get.snackbar('Error Occurred', e.toString(),
@@ -92,13 +92,19 @@ class _SignUpState extends State<SignUp> {
                     controller: _fullNameController,
                     keyboardType: TextInputType.name,
                     maxLength: 30,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^[a-zA-Z\s]*$'),
+                      ), // Allows only letters and spaces
+                    ],
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Enter full name',
                       prefixIcon: Icon(Icons.person),
                     ),
                     validator: (fullNameValue) {
-                      if (fullNameValue == null || fullNameValue.trim().isEmpty) {
+                      if (fullNameValue == null ||
+                          fullNameValue.trim().isEmpty) {
                         return 'Please Enter Full Name';
                       }
                       return null;
@@ -161,7 +167,9 @@ class _SignUpState extends State<SignUp> {
                       prefixIcon: const Icon(Icons.lock),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          passwordVisible ? Icons.visibility_off: Icons.visibility,
+                          passwordVisible
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
                         onPressed: () {
                           setState(() {
@@ -175,7 +183,8 @@ class _SignUpState extends State<SignUp> {
                       ),
                     ),
                     validator: (passwordValue) {
-                      if (passwordValue == null || passwordValue.trim().isEmpty) {
+                      if (passwordValue == null ||
+                          passwordValue.trim().isEmpty) {
                         return 'Please Enter password';
                       }
                       return null;
@@ -207,7 +216,8 @@ class _SignUpState extends State<SignUp> {
                       height: 50,
                       width: 300,
                       child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange),
                         onPressed: () async {
                           print('Sign up button clicked');
                           if (_formKey.currentState != null &&

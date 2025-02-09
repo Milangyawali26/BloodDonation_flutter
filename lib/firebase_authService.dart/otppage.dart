@@ -59,7 +59,7 @@ class _OtpPageState extends State<OtpPage> {
 
       if (user != null) {
         // Get FCM token after successful login/signup
-        String? fcmToken = await FirebaseMessaging.instance.getToken();
+      // String? fcmToken = await FirebaseMessaging.instance.getToken();
 
         // Create a new user model with the provided details
         final userModel = UserModel(
@@ -73,11 +73,11 @@ class _OtpPageState extends State<OtpPage> {
         FirebaseDatabaseServices().createUser(userModel: userModel);
 
         // Store the FCM token in Firestore
-        if (fcmToken != null) {
-          await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
-            'fcmToken': fcmToken, // Save FCM token to Firestore
-          });
-        }
+        // if (fcmToken != null) {
+        //   await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+        //     'fcmToken': fcmToken, // Save FCM token to Firestore
+        //   });
+        // }
 
         // Navigate to the home page or dashboard after successful signup
         Get.offAll(const Wrapper());

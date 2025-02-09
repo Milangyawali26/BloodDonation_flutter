@@ -62,6 +62,11 @@ class _DonorRegisterState extends State<DonorRegister> {
                 TextFormField(
                   controller: _fullNameController,
                   keyboardType: TextInputType.name,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^[a-zA-Z\s]*$'),
+                      ), // Allows only letters and spaces
+                    ],
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Enter full name',

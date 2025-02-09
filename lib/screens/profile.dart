@@ -1,12 +1,9 @@
-
 import 'package:blood_app/firebase_authService.dart/firebase_dataBase_services.dart';
+import 'package:blood_app/screens/donor_profile.dart';
+import 'package:blood_app/screens/myBloodRequest.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:blood_app/model/user_model.dart';
-
-
- // Import the location service
-
 import '../firebase_authService.dart/firebase_auth_service.dart';
 
 class Profile extends StatefulWidget {
@@ -17,8 +14,6 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-
-
   final FirebaseDatabaseServices _databaseServices = FirebaseDatabaseServices();
   User? currentUser = FirebaseAuth.instance.currentUser;
   UserModel? userModel;
@@ -31,7 +26,8 @@ class _ProfileState extends State<Profile> {
 
   Future<void> _fetchUserDetails() async {
     if (currentUser != null) {
-      final userDetails = await _databaseServices.getUserDetailsFromUid(uid: currentUser!.uid);
+      final userDetails =
+          await _databaseServices.getUserDetailsFromUid(uid: currentUser!.uid);
       setState(() {
         userModel = userDetails;
       });
@@ -58,20 +54,20 @@ class _ProfileState extends State<Profile> {
                       title: const Text('Signout User'),
                       content: const Text('Are you sure you want to Signout?'),
                       actions: [
-                        InkWell(
-                          child: const Text('Ok'),
-                          onTap: () async {
+                        TextButton(
+                          child: const Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('OK'),
+                          onPressed: () async {
                             final firebaseAuthService = FirebaseAuthService();
                             firebaseAuthService.signOutUser();
                             Navigator.of(dialogContext).pop();
-                            Navigator.of(context).pushReplacementNamed('/login');
-                          },
-                        ),
-                        const SizedBox(width: 5,),
-                        InkWell(
-                          child: const Text('Cancel'),
-                          onTap: () {
-                            Navigator.of(dialogContext).pop();
+                            Navigator.of(context)
+                                .pushReplacementNamed('/login');
                           },
                         ),
                       ],
@@ -82,117 +78,162 @@ class _ProfileState extends State<Profile> {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          child: userModel == null
-              ? const Center(child: CircularProgressIndicator())
-              : Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ListTile(
-                        title: const Text('Full Name'),
-                        subtitle: Text(userModel!.fullName ?? 'N/A'),
-                      ),
-                      ListTile(
-                        title: const Text('Phone Number'),
-                        subtitle: Text(userModel!.signUpPhoneNumber ?? 'N/A'),
-                      ),
+        body: userModel == null
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                child: Stack(
+                  children: [           Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(child: ProfileImage()),
+                        const SizedBox(height: 15),
+                        ListTile(
+                          title: const Text('Full Name'),
+                          subtitle: Text(userModel!.fullName ?? 'N/A'),
+                        ),
+                        ListTile(
+                          title: const Text('Phone Number'),
+                          subtitle: Text(userModel!.signUpPhoneNumber ?? 'N/A'),
+                        ),
 
-                      // btn to become donor
-                      Container(
-                        alignment: Alignment.topLeft,
-                        padding: const EdgeInsets.only(top: 20),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                          ),
-                          child: const Text(
-                            'Become a Donor',
-                            style: TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
+                        const SizedBox(height: 10),
+                        // Become a Donor button
+
+                        // Menu items
+                        MenuWidgets(
+                          title: 'Settings',
                           onPressed: () {
-                            Navigator.of(context).pushNamed('/donorRegister');
+                            print('Settings Clicked');
                           },
+                          icon: Icons.settings,
+                        ),
+                        const SizedBox(height: 20),
+                        MenuWidgets(
+                          title: 'Notifications',
+                          onPressed: () {
+                            print('Notifications Clicked');
+                          },
+                          icon: Icons.notifications,
+                        ),
+                        const SizedBox(height: 20),
+                        MenuWidgets(
+                          title: 'About App',
+                          icon: Icons.info,
+                        ),
+                      ],
+                    ),
+
+                    Positioned(
+                      right: 30,
+                      top: 130,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const DonorProfile()),
+                          );
+                        },
+                        child: const Text(
+                          "Donor Profile",
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
-                    
-                      Container(
-                        alignment: Alignment.topLeft,
-                        padding: const EdgeInsets.only(top: 20),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
+                    ),
+                    //my blood request
+                    Positioned(
+                      right: 30,
+                      top: 180,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
                           ),
-                          child: const Text(
-                            'Donor Profile',
-                            style: TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushNamed('/donorProfile');
-                          },
                         ),
-                      ),
-      
-                        //add  a blood request
-                        Container(
-                        alignment: Alignment.topLeft,
-                        padding: const EdgeInsets.only(top: 20),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                          ),
-                          child: const Text(
-                            'make a blood Request',
-                            style: TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushNamed('/addRequest');
-                          },
+                        child: const Text(
+                          'My Blood Request',
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
                         ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MyBloodRequest()),
+                          );
+                        },
                       ),
-                     
-                      //my  all requests
-                        Container(
-                        alignment: Alignment.topLeft,
-                        padding: const EdgeInsets.only(top: 20),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                          ),
-                          child: const Text(
-                            'my Blood Request',
-                            style: TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushNamed('/myBloodRequest');
-                          },
-                        ),
-                      ),
-                  
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-        ),
+              ),
       ),
     );
   }
 }
 
+// Circular profile image
+class ProfileImage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 100,
+      width: 100,
+      child: CircleAvatar(
+        backgroundImage: AssetImage('assets/profileimage.jpeg'),
+      ),
+    );
+  }
+}
 
+// Reusable menu widget
+class MenuWidgets extends StatelessWidget {
+  final String title;
+  final void Function()? onPressed;
+  final IconData icon;
+
+  const MenuWidgets({
+    required this.title,
+    this.onPressed,
+    this.icon = Icons.arrow_forward_ios,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3), // Changes position of shadow
+            ),
+          ],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: const TextStyle(fontSize: 16)),
+            Icon(icon, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
+  }
+}

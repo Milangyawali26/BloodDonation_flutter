@@ -104,14 +104,12 @@ class DonorModel {
       bloodGroup: donorData['bloodGroup'],  
       latitude: donorData['latitude'],
       longitude: donorData['longitude'],
-
       distance: donorData['distance'],
     );
   }
 }
 
 class RequestModel{
-
   String? userId;
   String? patientName;
   String? gender;
