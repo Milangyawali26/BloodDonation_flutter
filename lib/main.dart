@@ -1,9 +1,9 @@
 
 import 'package:blood_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'ML_model_services/tf_Lite_services.dart';
 import 'firebase_Service.dart/Wrapper.dart';
 import 'screens/become_donor.dart';
 import 'screens/btn_nav_bar.dart';
@@ -16,7 +16,13 @@ import 'screens/request_for_blood.dart';
 import 'screens/signup.dart';
 import 'screens/splash.dart';
 
+
 void main() async {
+
+  // 
+  WidgetsFlutterBinding.ensureInitialized();
+  final tfliteService = TFLiteService();
+  await tfliteService.loadModel();
 
   //initialize fire base 
   WidgetsFlutterBinding.ensureInitialized();

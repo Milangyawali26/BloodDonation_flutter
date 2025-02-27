@@ -37,12 +37,10 @@ class _DonorRegisterState extends State<DonorRegister> {
         initialDate: DateTime.now(),
         firstDate: DateTime(1900),
         lastDate: DateTime(2100));
-    if (picked != null) {
-      setState(() {
-        _dateOfBirthController.text = picked.toString().split(" ")[0];
-      });
+    setState(() {
+      _dateOfBirthController.text = picked.toString().split(" ")[0];
+    });
     }
-  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(

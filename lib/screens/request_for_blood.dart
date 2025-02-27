@@ -47,12 +47,10 @@ class _RequestForBloodState extends State<RequestForBlood> {
         initialDate: DateTime.now(),
         firstDate: DateTime(1900),
         lastDate: DateTime(2100));
-    if (picked != null) {
-      setState(() {
-        _selectedDateController.text = picked.toString().split(" ")[0];
-      });
+    setState(() {
+      _selectedDateController.text = picked.toString().split(" ")[0];
+    });
     }
-  }
 
 // function to select time
   Future<void> _selectTime() async {

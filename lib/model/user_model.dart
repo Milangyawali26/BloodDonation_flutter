@@ -102,6 +102,7 @@ class DonorModel {
       'bloodGroup': bloodGroup,  
       'latitude': latitude,
       'longitude': longitude,
+      
       'distance':distance,
        'lastDonationDate': lastDonationDate?.toIso8601String(),
       'totalDonations': totalDonations,

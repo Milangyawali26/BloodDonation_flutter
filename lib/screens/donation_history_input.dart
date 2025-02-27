@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import '../firebase_Service.dart/firebase_dataBase_services.dart';
 import '../model/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DonationInputDialog extends StatefulWidget {
   final DonorModel donorModel;
@@ -48,7 +47,7 @@ void _validateAndSubmit() {
 
   // Check if the new donation date is at least 2 months after the last donation
   if (widget.donorModel.lastDonationDate != null) {
-    DateTime minNextDonationDate = widget.donorModel.lastDonationDate!.add(Duration(days: 60));
+    DateTime minNextDonationDate = widget.donorModel.lastDonationDate!.add(const Duration(days: 60));
     if (selectedDate.isBefore(minNextDonationDate)) {
       setState(() {
         _dateError = 'Next donation date must be at least 2 months after the last donation';
@@ -122,10 +121,8 @@ void _validateAndSubmit() {
                 firstDate: DateTime(2000),
                 lastDate: DateTime(2100),
               );
-              if (pickedDate != null) {
-                donationDateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
-              }
-            },
+              donationDateController.text = DateFormat('yyyy-MM-dd').format(pickedDate!);
+                        },
             readOnly: true,
           ),
           TextField(

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../firebase_Service.dart/firebase_dataBase_services.dart';
+
+
+import '../firebase_Service.dart/firebase_database_services.dart';
 import '../firebase_Service.dart/firebase_msgServices.dart';
 import 'updateBloodRequest.dart';
 import '../model/user_model.dart';
+import 'package:blood_app/ML_model_services/tf_Lite_services.dart';
+import 'package:blood_app/ML_model_services/find_compatable_donor_services.dart';
 
 class MyBloodRequest extends StatefulWidget {
   const MyBloodRequest({super.key});
@@ -17,7 +21,12 @@ class _MyBloodRequestState extends State<MyBloodRequest> {
   final FirebaseDatabaseServices _firebaseDatabaseServices =
       FirebaseDatabaseServices();
   final FirebaseMsgServices _firebaseMsgServices =
-      FirebaseMsgServices(); // Create an instance of FirebaseMsgServices
+      FirebaseMsgServices(); // Messaging services
+  final DonorService _donorService = DonorService(
+    FirebaseDatabaseServices(),
+    TFLiteService(),
+  ); // Instantiate DonorService
+
   User? currentUser = FirebaseAuth.instance.currentUser;
   List<RequestModel> requests = [];
   List<DonorModel> compatibleDonors = [];
@@ -34,39 +43,6 @@ class _MyBloodRequestState extends State<MyBloodRequest> {
         requests = bloodRequest ?? [];
         _isLoading = false;
       });
-    }
-  }
-
-  Future<List<DonorModel>> getFilteredDonors(
-      String bloodGroup, double radius) async {
-    try {
-      // Get all donors
-      List<DonorModel> allDonors =
-          await _firebaseDatabaseServices.getDonorsFromDatabase();
-
-      // Define compatibility rules for blood donation
-      Map<String, List<String>> compatibility = {
-        "O-": ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"],
-        "O+": ["O+", "A+", "B+", "AB+"],
-        "A-": ["A-", "A+", "AB-", "AB+"],
-        "A+": ["A+", "AB+"],
-        "B-": ["B-", "B+", "AB-", "AB+"],
-        "B+": ["B+", "AB+"],
-        "AB-": ["AB-", "AB+"],
-        "AB+": ["AB+"],
-      };
-
-      // Check compatibility and filter donors by blood group and radius
-      List<DonorModel> filteredDonors = allDonors.where((donor) {
-        return compatibility[bloodGroup]?.contains(donor.bloodGroup) == true &&
-            donor.distance! <= radius;
-      }).toList();
-
-      print('Number of compatible donors: ${filteredDonors.length}');
-      return filteredDonors;
-    } catch (e) {
-      print('Error occurred while filtering donors: $e');
-      return [];
     }
   }
 
@@ -119,8 +95,8 @@ class _MyBloodRequestState extends State<MyBloodRequest> {
                     itemBuilder: (context, index) {
                       return BasicDetails(
                         requestModel: requests[index],
-                        getFilteredDonors:
-                            getFilteredDonors, // Pass the function here
+                        getFilteredDonors: _donorService
+                            .getFilteredDonors, // Pass the function here
                         onUpdateCompatibleDonors: (donors) {
                           setState(() {
                             compatibleDonors = donors;
@@ -181,7 +157,8 @@ class BasicDetails extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text('Blood Group: ${requestModel.bloodGroup ?? "-"}'),
                 const SizedBox(height: 5),
-                Text('Contact Person Name: ${requestModel.contactPersonName ?? "-"}'),
+                Text(
+                    'Contact Person Name: ${requestModel.contactPersonName ?? "-"}'),
                 const SizedBox(height: 5),
                 Text('Phone: ${requestModel.phoneNumber ?? "-"}'),
                 const SizedBox(height: 5),
@@ -199,7 +176,8 @@ class BasicDetails extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text('District: ${requestModel.district ?? "-"}'),
                 const SizedBox(height: 5),
-                Text('Local Government: ${requestModel.localGovernment ?? "-"}'),
+                Text(
+                    'Local Government: ${requestModel.localGovernment ?? "-"}'),
                 const SizedBox(height: 5),
                 Text('Request ID: ${requestModel.requestId ?? "-"}'),
               ],
@@ -327,7 +305,7 @@ Widget urgentButton(
 
                   print(
                       "number of conpatible donors of which userIds  collected ${userIds.length}");
-                  
+
                   // Send notifications to the compatible donors
                   await sendNotifications(userIds,
                       'Blood request: ${requestModel.patientName} needs blood.');

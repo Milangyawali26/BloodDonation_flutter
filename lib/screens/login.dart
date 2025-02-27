@@ -111,7 +111,7 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20,),
+                  const SizedBox(height: 20,),
                    Container(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -158,13 +158,11 @@ class _LoginState extends State<Login> {
 
         // Get FCM token after successful login
         String? fcmToken = await FirebaseMessaging.instance.getToken();
-        if (fcmToken != null) {
-          // Save FCM token to Firestore
-          await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).update({
-            'fcmToken': fcmToken,
-          });
-        }
-
+        // Save FCM token to Firestore
+        await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).update({
+          'fcmToken': fcmToken,
+        });
+      
         // Store userId in SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('userId', userCredential.user?.uid ?? '');

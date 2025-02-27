@@ -2,9 +2,6 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    
-
-
 }
 
 def localProperties = new Properties()
@@ -26,6 +23,7 @@ if (flutterVersionName == null) {
 }
 
 android {
+    compileSdkVersion 34
     namespace "com.example.blood_app"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
@@ -33,6 +31,11 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    aaptOptions {
+        noCompress 'tflite'
+        noCompress 'lite'
     }
 
     kotlinOptions {

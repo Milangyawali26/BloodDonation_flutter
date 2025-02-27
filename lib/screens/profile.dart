@@ -87,7 +87,7 @@ class _ProfileState extends State<Profile> {
                   children: [           Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Center(child: ProfileImage()),
+                        const Center(child: ProfileImage()),
                         const SizedBox(height: 15),
                         ListTile(
                           title: const Text('Full Name'),
@@ -118,7 +118,7 @@ class _ProfileState extends State<Profile> {
                           icon: Icons.notifications,
                         ),
                         const SizedBox(height: 20),
-                        MenuWidgets(
+                        const MenuWidgets(
                           title: 'About App',
                           icon: Icons.info,
                         ),
@@ -184,6 +184,8 @@ class _ProfileState extends State<Profile> {
 
 // Circular profile image
 class ProfileImage extends StatelessWidget {
+  const ProfileImage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const SizedBox(
@@ -202,7 +204,7 @@ class MenuWidgets extends StatelessWidget {
   final void Function()? onPressed;
   final IconData icon;
 
-  const MenuWidgets({
+  const MenuWidgets({super.key, 
     required this.title,
     this.onPressed,
     this.icon = Icons.arrow_forward_ios,
